@@ -12,7 +12,7 @@ const Header =() =>{
             <nav>
                 <ul>
                     <li>
-                        <NavLink activeClassName={classes.active} to="/connexion">Connexion</NavLink>
+                        <NavLink activeClassName={classes.active} to="/">Connexion</NavLink>
                     </li>
                 </ul>
             </nav>
