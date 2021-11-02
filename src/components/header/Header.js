@@ -12,7 +12,15 @@ const Header =() =>{
             <nav>
                 <ul>
                     <li>
-                        <NavLink activeClassName={classes.active} to="/">Connexion</NavLink>
+                        <NavLink activeClassName={classes.active} to="/" isActive={(match, location) => {
+                            if (!match) return false;
+                            if(match.url === "/connexion" || match.url === "/"){
+                                return true;
+                            }
+                        }}>Connexion</NavLink>
+                    </li>
+                    <li>
+                        <NavLink activeClassName={classes.active} to="/administration">Administration</NavLink>
                     </li>
                 </ul>
             </nav>
