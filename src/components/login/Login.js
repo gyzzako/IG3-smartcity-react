@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../../assets/logo-food.png"; //tu peux changer de logo si tu veux.
+import logo from "../../assets/images/logo-food.png"; //tu peux changer de logo si tu veux.
 import classes from './Login.module.css';
 import Header from "../header/Header";
 
