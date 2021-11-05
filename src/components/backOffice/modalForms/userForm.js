@@ -1,128 +1,114 @@
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import classes from '../BackOffice.module.css';
 
 export function getUserForm(modalInstance){
     modalInstance.tempRow.isadmin = false;
     return (
         <>
-            <Modal.Header closeButton>
-                <Modal.Title>Ajout/Modifications</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <form className={classes.form}>
-                    <div>
-                        <label htmlFor='firstname'>Prénom</label>
-                        <input className="form-control"
-                            type='text'
-                            id='firstname'
-                            name="firstname"
-                            defaultValue={modalInstance.oldRowObject?.firstname}
-                            onChange={(e) => { modalInstance.tempRow.firstname = e.target.value }}
-                            required />
-                    </div>
-                    <div>
-                        <label htmlFor='lastname'>Nom</label>
-                        <input className="form-control"
-                            type='text'
-                            id='lastname'
-                            name="lastname"
-                            defaultValue={modalInstance.oldRowObject?.lastname}
-                            onChange={(e) => { modalInstance.tempRow.lastname = e.target.value }}
-                            required />
-                    </div>
-                    <div>
-                        <label htmlFor='phoneNumber'>Téléphone</label>
-                        <input className="form-control"
-                            type='text'
-                            id='phoneNumber'
-                            name="phoneNumber"
-                            defaultValue={modalInstance.oldRowObject?.phone_number}
-                            onChange={(e) => { modalInstance.tempRow.phone_number = e.target.value }}
-                            required />
-                    </div>
-                    <div>
-                        <label htmlFor='username'>Pseudo</label>
-                        <input className="form-control"
-                            type='text'
-                            id='username'
-                            name="username"
-                            defaultValue={modalInstance.oldRowObject?.username}
-                            onChange={(e) => { modalInstance.tempRow.username = e.target.value }}
-                            required />
-                    </div>
-                    <div>
-                        <label htmlFor='password'>Mot de passe</label>
-                        <input className="form-control"
-                            type='password'
-                            id='password'
-                            name="password"
-                            defaultValue={modalInstance.oldRowObject?.password}
-                            onChange={(e) => { modalInstance.tempRow.password = e.target.value }}
-                            required />
-                    </div>
-                    <div className="row">
-                        <label htmlFor='isAdmin'>Administrateur</label>
-                        <div className="col">
-                            Oui<input type='radio'
+            <form className={classes.form}>
+                <div>
+                    <label htmlFor='firstname'>Prénom</label>
+                    <input className="form-control"
+                        type='text'
+                        id='firstname'
+                        name="firstname"
+                        defaultValue={modalInstance.oldRowObject?.firstname}
+                        onChange={(e) => { modalInstance.tempRow.firstname = e.target.value }}
+                        required />
+                </div>
+                <div>
+                    <label htmlFor='lastname'>Nom</label>
+                    <input className="form-control"
+                        type='text'
+                        id='lastname'
+                        name="lastname"
+                        defaultValue={modalInstance.oldRowObject?.lastname}
+                        onChange={(e) => { modalInstance.tempRow.lastname = e.target.value }}
+                        required />
+                </div>
+                <div>
+                    <label htmlFor='phoneNumber'>Téléphone</label>
+                    <input className="form-control"
+                        type='text'
+                        id='phoneNumber'
+                        name="phoneNumber"
+                        defaultValue={modalInstance.oldRowObject?.phone_number}
+                        onChange={(e) => { modalInstance.tempRow.phone_number = e.target.value }}
+                        required />
+                </div>
+                <div>
+                    <label htmlFor='username'>Pseudo</label>
+                    <input className="form-control"
+                        type='text'
+                        id='username'
+                        name="username"
+                        defaultValue={modalInstance.oldRowObject?.username}
+                        onChange={(e) => { modalInstance.tempRow.username = e.target.value }}
+                        required />
+                </div>
+                <div>
+                    <label htmlFor='password'>Mot de passe</label>
+                    <input className="form-control"
+                        type='password'
+                        id='password'
+                        name="password"
+                        defaultValue={modalInstance.oldRowObject?.password}
+                        onChange={(e) => { modalInstance.tempRow.password = e.target.value }}
+                        required />
+                </div>
+                <div className="row">
+                    <label htmlFor='isAdmin'>Administrateur</label>
+                    <div className="col">
+                        Oui<input type='radio'
                             name='isAdmin'
                             value='true'
-                            defaultChecked={modalInstance.tempRow.isadmin}
+                            defaultChecked={modalInstance.oldRowObject.isadmin ? true : false}
                             onChange={(e) => {
-                                if(e.target.value === "true") modalInstance.tempRow.isadmin = true;
+                                if (e.target.value === "true") modalInstance.tempRow.isadmin = true;
                                 else modalInstance.tempRow.isadmin = false;
-                            }}/>
+                            }} />
 
-                            Non<input type='radio'
+                        Non<input type='radio'
                             name='isAdmin'
                             value='false'
-                            defaultChecked={!modalInstance.tempRow.isadmin}
+                            defaultChecked={modalInstance.oldRowObject.isadmin ? false : true}
                             onChange={(e) => {
-                                if(e.target.value === "true") modalInstance.tempRow.isadmin = true;
+                                if (e.target.value === "true") modalInstance.tempRow.isadmin = true;
                                 else modalInstance.tempRow.isadmin = false;
-                            }}/>
-                        </div>
+                            }} />
                     </div>
-                    <div>
-                        <label htmlFor='province'>Province</label>
-                        <input className="form-control"
-                            type='text'
-                            id='province'
-                            name="province"
-                            defaultValue={modalInstance.oldRowObject?.province}
-                            onChange={(e) => { modalInstance.tempRow.province = e.target.value }}
-                            required />
-                    </div>
-                    <div>
-                        <label htmlFor='city'>Ville</label>
-                        <input className="form-control"
-                            type='text'
-                            id='city'
-                            name="city"
-                            defaultValue={modalInstance.oldRowObject?.city}
-                            onChange={(e) => { modalInstance.tempRow.city = e.target.value }}
-                            required />
-                    </div>
-                    <div>
-                        <label htmlFor='streetAndNumber'>Rue et numéro</label>
-                        <input className="form-control"
-                            type='text'
-                            id='streetAndNumber'
-                            name="streetAndNumber"
-                            defaultValue={modalInstance.oldRowObject?.street_and_number}
-                            onChange={(e) => { modalInstance.tempRow.street_and_number = e.target.value }}
-                            required />
-                    </div>                    
-                </form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => modalInstance.CloseModal()}>
-                    Fermer
-                </Button>
-                <Button variant="primary" onClick={() => modalInstance.saveModifications()}>
-                    Sauvegarder
-                </Button>
-            </Modal.Footer>
+                </div>
+                <div>
+                    <label htmlFor='province'>Province</label>
+                    <input className="form-control"
+                        type='text'
+                        id='province'
+                        name="province"
+                        defaultValue={modalInstance.oldRowObject?.province}
+                        onChange={(e) => { modalInstance.tempRow.province = e.target.value }}
+                        required />
+                </div>
+                <div>
+                    <label htmlFor='city'>Ville</label>
+                    <input className="form-control"
+                        type='text'
+                        id='city'
+                        name="city"
+                        defaultValue={modalInstance.oldRowObject?.city}
+                        onChange={(e) => { modalInstance.tempRow.city = e.target.value }}
+                        required />
+                </div>
+                <div>
+                    <label htmlFor='streetAndNumber'>Rue et numéro</label>
+                    <input className="form-control"
+                        type='text'
+                        id='streetAndNumber'
+                        name="streetAndNumber"
+                        defaultValue={modalInstance.oldRowObject?.street_and_number}
+                        onChange={(e) => { modalInstance.tempRow.street_and_number = e.target.value }}
+                        required />
+                </div>
+            </form>
         </>
     )
 }

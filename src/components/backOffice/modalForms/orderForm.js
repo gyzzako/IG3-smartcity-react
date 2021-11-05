@@ -1,5 +1,4 @@
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import classes from '../BackOffice.module.css';
 import {fromYYYYMMDDToDDMMYYYY, fromDDMMYYYYToYYYYMMDD} from '../../../utils/dateFormatConverter';
 
@@ -14,38 +13,25 @@ export function getOrderForm(modalInstance){
     console.log(modalInstance.tempRow)
     return (
         <>
-            <Modal.Header closeButton>
-                <Modal.Title>Ajout/Modifications</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <form className={classes.form}>
-                    <div>
-                        <label htmlFor='orderDate'>Date de commande</label>
-                        <input className="form-control" type="date" id="orderDate" name="orderDate"
-                            defaultValue={date} required onChange={(e) => {modalInstance.tempRow.order_date = e.target.value}}>
-                        </input>
-                    </div>
-                    <div>
-                        <label htmlFor='userId'>Id de l'utilisateur</label>
-                        <input className="form-control"
-                            type='number'
-                            id='userId'
-                            name="userId"
-                            min="0"
-                            defaultValue={modalInstance.oldRowObject?.user_fk}
-                            onChange={(e) => { modalInstance.tempRow.user_fk = parseInt(e.target.value) }}
-                            required />
-                    </div>
-                </form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => modalInstance.CloseModal()}>
-                    Fermer
-                </Button>
-                <Button variant="primary" onClick={() => modalInstance.saveModifications()}>
-                    Sauvegarder
-                </Button>
-            </Modal.Footer>
+            <form className={classes.form}>
+                <div>
+                    <label htmlFor='orderDate'>Date de commande</label>
+                    <input className="form-control" type="date" id="orderDate" name="orderDate"
+                        defaultValue={date} required onChange={(e) => { modalInstance.tempRow.order_date = e.target.value }}>
+                    </input>
+                </div>
+                <div>
+                    <label htmlFor='userId'>Id de l'utilisateur</label>
+                    <input className="form-control"
+                        type='number'
+                        id='userId'
+                        name="userId"
+                        min="0"
+                        defaultValue={modalInstance.oldRowObject?.user_fk}
+                        onChange={(e) => { modalInstance.tempRow.user_fk = parseInt(e.target.value) }}
+                        required />
+                </div>
+            </form>
         </>
     )
 }

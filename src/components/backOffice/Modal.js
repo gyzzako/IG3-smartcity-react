@@ -1,4 +1,5 @@
 import React from "react";
+import Button from 'react-bootstrap/Button';
 import {getMealForm, isMealFormValid} from './modalForms/mealForm';
 import {getUserForm, isUserFormValid} from './modalForms/userForm';
 import {getOrderForm, isOrderFormValid} from './modalForms/orderForm';
@@ -61,7 +62,22 @@ class MealModal extends React.Component{
         return(
             <>
             <Modal size="lg" centered show={true} onHide={() => this.CloseModal()}>
+            <Modal.Header closeButton>
+                <Modal.Title>{this.oldRowObject !== undefined ? "Modification" : "Ajout"}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+
             {this.state.form}
+            
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={() => this.CloseModal()}>
+                    Fermer
+                </Button>
+                <Button variant="primary" onClick={() => this.saveModifications()}>
+                    Sauvegarder
+                </Button>
+            </Modal.Footer>
             </Modal>
             </>
         );
