@@ -9,6 +9,8 @@
     width: 20rem;
     height: 85vh;
     background-color: #38015c;
+    border: 1px solid #9f5ccc;
+    border-radius: 20px;
 }
  .tableData{
      width: 100%;
@@ -23,10 +25,37 @@
     width: 100%;
     margin-left: auto;
     margin-right: auto;
+
  }
 
  .tableData td{
-    border: 1px solid #333;
-    border-collapse: collapse;
-    padding: 05px 10px;
+    border: 1px solid #ddd;
+    padding: 8px;
+ }
+
+ .tableData th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    background-color: #38015c;
+    color: white;
+  }
+
+ .tableRow:nth-child(even){
+     background-color: #f2f2f2;
+}
+
+.tableRow:hover{
+    background-color: #ddd;
+ }
+
+ .tableData th:first-child {
+    width: 5%;
+ }
+
+ .form div{
+    float: left;
+    width: 50%;
+    padding: 10px;
+    margin-bottom: 1rem;
  }

@@ -1,6 +1,6 @@
 import React from "react";
 import classes from './BackOffice.module.css';
-import css from './css.css';
+import './css.css';
 import {Navbar, Container} from 'react-bootstrap';
 
 
@@ -8,7 +8,7 @@ class ActionBar extends React.Component{
     constructor(props){
         super(props);
         this.state={
-            categories:["Meal", "User", "Order", "Category"],
+            categories:[{meal: "Repas"}, {user: "Utilisateur"}, {order: "Commande"}, {category: "Catégorie"}],
             chosenTable: props.chosenTableCallback,
             clickedCategoryIndex: undefined
         }
@@ -19,21 +19,19 @@ class ActionBar extends React.Component{
       };
 
     render(){
-        const isActive = this.state.isActive;
         return(
         <div className={classes.category}>
             <h2 style={{color: 'white'}}>Tables</h2>
             <br />
-
             {
                 this.state.categories.map((category, index) => {
                     return(
-                        <Navbar>
+                        <Navbar key={index}>
                             <Container>
-                                <Navbar.Brand key={index} className={index === this.state.clickedCategoryIndex ? "clicked" : null} onClick={() => {
-                                    this.state.chosenTable(category.toLocaleLowerCase());
+                                <Navbar.Brand className={index === this.state.clickedCategoryIndex ? "clicked" : null} onClick={() => {
+                                    this.state.chosenTable(Object.keys(category)[0]);
                                     this.setClicked(index);
-                                }} style={{color: 'white', cursor: 'pointer'}}>{category}</Navbar.Brand>
+                                }} style={{color: 'white', cursor: 'pointer'}}>{Object.values(category)[0]}</Navbar.Brand>
                             </Container>
                         </Navbar>
                     )
