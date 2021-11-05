@@ -12,8 +12,6 @@ class BackOffice extends React.Component{
         }
     }
 
-    //TODO: formulaire des modals + delete row
-
     //key={} pour que le composant sache quand le props change pour le refresh
     render(){
         return(

@@ -115,7 +115,7 @@ class Table extends React.Component{
                         </tr>
                     </thead>
                     <tbody>
-                        {tableRowsForUse.map((rowObject, index) => {
+                        {tableRowsForUse.map((rowObject, index) => { //TODO: si on fait une api qui renvoie des objets -> faire un mapper qui genère le tableau en fonction des différentes tables
                             return (
                                 <tr className={classes.tableRow} key={index}>
                                     <td>
