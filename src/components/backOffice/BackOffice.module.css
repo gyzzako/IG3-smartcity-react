@@ -20,29 +20,17 @@
      margin-right: 2rem;
      margin-bottom: 1.5rem;
  }
- 
-.tableData table tbody{
-   display: block;
-   height: 66vh;
-   overflow: auto;
-}
-
-.tableData table thead, tbody, tr{
-   display: table;
-   width: 100%;
-   table-layout: fixed;
-}
-
-.tableBody{
-   width: 100%;
-   overflow-y: auto;
-}
 
 .tableData table{
     width: 100%;
     margin-left: auto;
     margin-right: auto;
+ }
 
+ .table{
+    width: 100%;
+    height: 73vh;
+    overflow-x: scroll;
  }
 
  .tableData td{
