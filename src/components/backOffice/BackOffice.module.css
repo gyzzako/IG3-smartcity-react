@@ -7,7 +7,7 @@
     padding: 2rem;
     margin: 1.5rem;
     width: 20rem;
-    height: 85vh;
+    height: 80vh;
     background-color: #38015c;
     border: 1px solid #9f5ccc;
     border-radius: 20px;
@@ -21,7 +21,24 @@
      margin-bottom: 1.5rem;
  }
  
- .tableData table{
+.tableData table tbody{
+   display: block;
+   height: 66vh;
+   overflow: auto;
+}
+
+.tableData table thead, tbody, tr{
+   display: table;
+   width: 100%;
+   table-layout: fixed;
+}
+
+.tableBody{
+   width: 100%;
+   overflow-y: auto;
+}
+
+.tableData table{
     width: 100%;
     margin-left: auto;
     margin-right: auto;
