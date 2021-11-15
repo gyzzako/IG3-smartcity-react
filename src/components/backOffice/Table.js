@@ -62,7 +62,9 @@ class Table extends React.Component{
             <div className={classes.tableData}>
                 <input onChange={(e) => {this.searchInTable(e.target.value)}} style={{float: "left", height: 40}} placeholder="Rechercher" type="text"/>
                 <button onClick={() => this.showModal()} style={{backgroundColor : "#38015c", color: "white", float: "right"}} className="btn mb-3">AJOUTER</button>
-                {this.state.showTable && table}
+                <div className={classes.table}>
+                    {this.state.showTable && table}
+                </div>
                 {this.state.showTable && this.state.showModal && <MealModal rowObjectToModify={this.rowObjectToModify} closeModalCallback={() => this.closeModal()} 
                     saveModificationsCallback={(newRowObject) => { this.saveModificationsModal(newRowObject) }} 
                     addNewRowCallback={(newRowObject) => { this.addNewRow(newRowObject) }} key={this.state.chosenTable} chosenTable={this.state.chosenTable}/>
@@ -114,7 +116,7 @@ class Table extends React.Component{
                             })}
                         </tr>
                     </thead>
-                    <tbody className={classes.tableBody}>
+                    <tbody>
                         {tableRowsForUse.map((rowObject, index) => { //TODO: si on fait une api qui renvoie des objets -> faire un mapper qui genère le tableau en fonction des différentes tables
                             return (
                                 <tr className={classes.tableRow} key={index}>
