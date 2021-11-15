@@ -1,4 +1,3 @@
-import Modal from 'react-bootstrap/Modal';
 import classes from '../BackOffice.module.css';
 
 export function getUserForm(modalInstance){
@@ -62,7 +61,7 @@ export function getUserForm(modalInstance){
                         Oui<input type='radio'
                             name='isAdmin'
                             value='true'
-                            defaultChecked={modalInstance.oldRowObject.isadmin ? true : false}
+                            defaultChecked={modalInstance.oldRowObject?.isadmin ? true : false}
                             onChange={(e) => {
                                 if (e.target.value === "true") modalInstance.tempRow.isadmin = true;
                                 else modalInstance.tempRow.isadmin = false;
@@ -71,7 +70,7 @@ export function getUserForm(modalInstance){
                         Non<input type='radio'
                             name='isAdmin'
                             value='false'
-                            defaultChecked={modalInstance.oldRowObject.isadmin ? false : true}
+                            defaultChecked={modalInstance.oldRowObject?.isadmin ? false : true}
                             onChange={(e) => {
                                 if (e.target.value === "true") modalInstance.tempRow.isadmin = true;
                                 else modalInstance.tempRow.isadmin = false;

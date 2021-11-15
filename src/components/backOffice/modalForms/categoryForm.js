@@ -1,4 +1,3 @@
-import Modal from 'react-bootstrap/Modal';
 import classes from '../BackOffice.module.css';
 
 export function getCategoryForm(modalInstance){
