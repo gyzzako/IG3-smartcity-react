@@ -1,6 +1,6 @@
 import React from "react";
 import classes from './BackOffice.module.css';
-import MealModal from "./Modal";
+import TableModal from "./TableModal";
 import axios from 'axios';
 import objectFormatterForAPI from '../../utils/objectFormatterForAPI';
 
@@ -21,6 +21,8 @@ class Table extends React.Component{
         this.mealTableColumnsName = [{id: "Id"}, {name: "Nom"}, {description: "Description"}, {portion_number: "Nombre de portion"}, {publication_date: "Date de publication"}, {user_fk: "Id de l'utilisateur"}, {category_fk: "Id de la categorie"}, {order_fk: "Id de la commande"}, {image:"URL de l'image"}]; 
         this.orderTableColumnsName = [{id: "Id"}, {order_date: "Date de la commande"}, {user_fk: "Id de l'utilisateur"}]
         this.categoryTableColumnsName = [{id: "Id"}, {name: "Nom"}]
+
+        this.check = undefined
     }
 
     closeModal(){
@@ -52,10 +54,26 @@ class Table extends React.Component{
 
     render(){
         let table;
-        if(this.state.chosenTable === "user") table = this.createTable(this.userTableColumnsName);
-        if(this.state.chosenTable === "meal") table = this.createTable(this.mealTableColumnsName);
-        if(this.state.chosenTable === "order") table = this.createTable(this.orderTableColumnsName);
-        if(this.state.chosenTable === "category") table = this.createTable(this.categoryTableColumnsName);
+        switch(this.state.chosenTable){
+            case "meal":
+                table = this.createTable(this.mealTableColumnsName);
+                this.check = (row, research) => {return row.name?.toLowerCase().includes(research.toLowerCase()) || row.description?.toLowerCase().includes(research.toLowerCase())};
+                break;
+            case "user":
+                table = this.createTable(this.userTableColumnsName);
+                this.check = (row, research) => {return row.firstname?.toLowerCase().includes(research.toLowerCase()) || row.lastname?.toLowerCase().includes(research.toLowerCase()) || row.username?.toLowerCase().includes(research.toLowerCase())};
+                break;
+            case "order":
+                table = this.createTable(this.orderTableColumnsName);
+                this.check = (row, research) => {return row.order_date?.toLowerCase().includes(research.toLowerCase())};
+                break;
+            case "category":
+                table = this.createTable(this.categoryTableColumnsName);
+                this.check = (row, research) => {return row.name?.toLowerCase().includes(research.toLowerCase())};
+                break;
+            default:
+                table = undefined;
+        }
 
         return(
             <div className={classes.tableData}>
@@ -64,7 +82,7 @@ class Table extends React.Component{
                 <div className={classes.table}>
                     {this.state.showTable && table}
                 </div>
-                {this.state.showTable && this.state.showModal && <MealModal rowObjectToModify={this.rowObjectToModify} closeModalCallback={() => this.closeModal()} 
+                {this.state.showTable && this.state.showModal && <TableModal rowObjectToModify={this.rowObjectToModify} closeModalCallback={() => this.closeModal()} 
                     saveModificationsCallback={(newRowObject) => { this.saveModificationsModal(newRowObject) }} 
                     addNewRowCallback={(newRowObject) => { this.addNewRow(newRowObject) }} key={this.state.chosenTable} chosenTable={this.state.chosenTable}/>
                 }
@@ -76,17 +94,7 @@ class Table extends React.Component{
         if(this.state.tableRows){
             const rowsToShow = this.state.tableRows;
             const afterFiltering = rowsToShow.filter(row => {
-                if(this.state.chosenTable === "meal"){
-                    return row.name?.toLowerCase().includes(research.toLowerCase()) || row.description?.toLowerCase().includes(research.toLowerCase());
-                }else if(this.state.chosenTable === "user"){
-                    return row.firstname?.toLowerCase().includes(research.toLowerCase()) || row.lastname?.toLowerCase().includes(research.toLowerCase()) || row.username?.toLowerCase().includes(research.toLowerCase());
-                }else if(this.state.chosenTable === "order"){
-                    return row.order_date?.toLowerCase().includes(research.toLowerCase());
-                }else if(this.state.chosenTable === "category"){
-                    return row.name?.toLowerCase().includes(research.toLowerCase());
-                }else{
-                    return false;
-                }
+                return this.check(row, research);
             })
             this.setState({rowsToShow: afterFiltering});
         }
@@ -120,7 +128,7 @@ class Table extends React.Component{
                             return (
                                 <tr className={classes.tableRow} key={index}>
                                     <td>
-                                        <button className="btn" onClick={() => {
+                                        <button className="btn" onClick={() => { //modify button
                                             this.showModal(rowObject);
                                         }}><i className="far fa-edit"></i></button>
                                         <button className="btn" onClick={() => this.deleteRow(rowObject.id)}><i className="far fa-trash-alt"></i></button>
