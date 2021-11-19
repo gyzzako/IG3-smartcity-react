@@ -9,7 +9,6 @@ export function getOrderForm(modalInstance){
     }else{
         date = fromDDMMYYYYToYYYYMMDD();
     }
-    console.log(modalInstance.tempRow)
     return (
         <>
             <form className={classes.form}>

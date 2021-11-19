@@ -3,6 +3,7 @@ import classes from './BackOffice.module.css';
 import TableModal from "./TableModal";
 import axios from 'axios';
 import objectFormatterForAPI from '../../utils/objectFormatterForAPI';
+import utils from '../../utils/utils';
 
 class Table extends React.Component{
     constructor(props){
@@ -29,6 +30,7 @@ class Table extends React.Component{
         this.rowObjectToModify = undefined;
         this.setState({showModal: false});
     } 
+
     showModal(rowObject){
         this.rowObjectToModify = rowObject;
         this.setState({showModal: true});
@@ -37,18 +39,20 @@ class Table extends React.Component{
     async componentDidMount(){
         await this.getTableRowsFromAPI();
     }
+    
     async getTableRowsFromAPI(){
         if(this.state.chosenTable !== undefined){
+            const config = utils.getAPIHeaderWithJWTToken();
             try{
-                const {data} = await axios.get(`http://localhost:3001/v1/${this.state.chosenTable}`);
+                const {data} = await axios.get(`http://localhost:3001/v1/${this.state.chosenTable}`, config);
                 const rowsData = data;
                 if(rowsData !== undefined){
                     this.setState({tableRows: rowsData, rowsToShow: undefined, showTable: true});
                 }
             }catch(e){
                 alert("API unreachable");
+                console.error(e.response.status);
             }
-            
         }
     }
 
@@ -157,7 +161,8 @@ class Table extends React.Component{
             try{
                 const rowForAPI = objectFormatterForAPI.formatObject(this.state.chosenTable, modifiedObject);
 
-                const response = await axios.patch(`http://localhost:3001/v1/${this.state.chosenTable}`, rowForAPI)
+                const config = utils.getAPIHeaderWithJWTToken();
+                const response = await axios.patch(`http://localhost:3001/v1/${this.state.chosenTable}`, rowForAPI, config)
                 if(response?.status === 204){
                     const id = modifiedObject.id;
                     let iTableRow;
@@ -175,7 +180,8 @@ class Table extends React.Component{
                     alert("Couldn't update database")
                 }
             }catch(e){
-                alert("Error while reaching API")
+                alert("Error while reaching API");
+                console.error(e.response.status);
             }
         }
         this.closeModal();
@@ -196,7 +202,8 @@ class Table extends React.Component{
             id: id
         }
         try{
-            const response = await axios.delete(`http://localhost:3001/v1/${this.state.chosenTable}`, { data: idForAPI }); //TODO: quand on met une fk qui n'exite pas pour order, category ou user -> pas de response mais direct dans le catch (pareil pour patch)
+            const config = utils.getAPIHeaderWithJWTToken();
+            const response = await axios.delete(`http://localhost:3001/v1/${this.state.chosenTable}`, {data: idForAPI, headers: config.headers}); //TODO: quand on met une fk qui n'exite pas pour order, category ou user -> pas de response mais direct dans le catch (pareil pour patch)
             if(response?.status === 204){
                 //update table in react
                 let iTableRow;
@@ -214,7 +221,8 @@ class Table extends React.Component{
                 alert("Couldn't update database")
             }
         }catch(e){
-            alert("Error while reaching API")
+            alert("Error while reaching API");
+            console.error(e.response.status);
         }
     }
 
@@ -222,15 +230,17 @@ class Table extends React.Component{
         try{
             const rowForAPI = objectFormatterForAPI.formatObject(this.state.chosenTable, newRowObject);
 
-            const response = await axios.post(`http://localhost:3001/v1/${this.state.chosenTable}`, rowForAPI);
+            const config = utils.getAPIHeaderWithJWTToken();
+            const response = await axios.post(`http://localhost:3001/v1/${this.state.chosenTable}`, rowForAPI, config);
             if(response?.status === 201){
                 //update table in react
                 this.getTableRowsFromAPI()
             }else{
-                alert("Couldn't update database")
+                alert("Couldn't update database");
             }
         }catch(e){
-            alert("Error while reaching API")
+            alert("Error while reaching API");
+            console.error(e.response.status);
         }
         this.closeModal();
     }
