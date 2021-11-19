@@ -35,7 +35,6 @@ class Table extends React.Component{
     async componentDidMount(){
         await this.getTableRowsFromAPI();
     }
-
     async getTableRowsFromAPI(){
         if(this.state.chosenTable !== undefined){
             try{

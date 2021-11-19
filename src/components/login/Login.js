@@ -2,6 +2,8 @@ import React from "react";
 import logo from "../../assets/images/logo-food.png";
 import classes from './Login.module.css';
 import Header from "../header/Header";
+import axios from "axios";
+import { Redirect } from "react-router-dom";
 
 class Login extends React.Component{
     constructor() {
@@ -10,7 +12,9 @@ class Login extends React.Component{
             username :"",
             password :"",
             usernameError :"",
-            passwordError :""
+            passwordError :"",
+            loginErrorMessage :"",
+            redirectToAdministration : false
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -20,14 +24,12 @@ class Login extends React.Component{
         this.setState({[event.target.name] : event.target.value});
     }
 
+    /* --> Cette fonction sera utilisée plus tard , pas supprimer stp.
     validateInputs(){
         let usernameError = "";
         let passwordError ="";
 
         if(this.state.username === undefined || this.state.username === ""){
-            usernameError ="pseudo utilisateur non valide !"
-        }
-        if(!this.state.username.match(/^([a-zA-Z ]){2,30}$/)){
             usernameError ="pseudo utilisateur non valide !"
         }
         if(usernameError){
@@ -39,17 +41,30 @@ class Login extends React.Component{
         if(passwordError){
             this.setState({passwordError : passwordError});
         }
-    }
+    }*/
 
     handleSubmit(event){
-        const isValidForm = this.validateInputs();
-        if(isValidForm){
-            console.log(this.state);
-        }
+        const data = {
+            username : this.state.username,
+            password : this.state.password
+        };
+        axios.post(" http://localhost:3001/v1/user/login",data)
+            .then((response) =>{
+                this.setState({ redirectToAdministration :true ,loginErrorMessage : ""})
+            })
+            .catch((error) => {
+                if( error.response && error.response.status === 401){
+                    this.setState({ loginErrorMessage : "Erreur d'identification/mot de passe ou pseudo non valide !" })
+                }
+            });
         event.preventDefault();
     }
 
     render(){
+        const { redirectToAdministration } = this.state;
+        if(redirectToAdministration){
+            return <Redirect to="/administration"/>
+        }
         return(
             <div className="text-center">
                 <Header />
@@ -67,13 +82,7 @@ class Login extends React.Component{
                                 value={this.state.username}
                                 onChange={this.handleChange}/>
                         </div>
-                        {
-                            this.state.usernameError !== "" ? (
-                                <div className="alert alert-warning" role="alert">
-                                    {this.state.usernameError}
-                                </div>
-                            ) : null
-                        }
+
                         <div className={classes.control}>
                             <label htmlFor='password'>Mot de passe</label>
                             <input
@@ -84,7 +93,7 @@ class Login extends React.Component{
                                 onChange={this.handleChange} />
                         </div>
                         {
-                            this.state.passwordError !== "" ? (
+                            this.state.loginErrorMessage !== "" ? (
                                 <div className="alert alert-warning" role="alert">
                                     {this.state.passwordError}
                                 </div>
