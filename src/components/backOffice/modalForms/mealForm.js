@@ -9,6 +9,7 @@ export function getMealForm(modalInstance){
         date = fromDDMMYYYYToYYYYMMDD();
         modalInstance.tempRow.publication_date = date;
     }
+    modalInstance.tempRow.oldImageName = modalInstance.oldRowObject?.image;
     return (
         <>
             <form className={classes.form}>
@@ -79,17 +80,18 @@ export function getMealForm(modalInstance){
                         name="orderId"
                         min="0"
                         defaultValue={modalInstance.oldRowObject?.order_fk}
-                        onChange={(e) => { modalInstance.tempRow.order_fk = parseInt(e.target.value) }}
+                        onChange={(e) => {modalInstance.tempRow.order_fk = isNaN(parseInt(e.target.value)) ? undefined : parseInt(e.target.value) }}
                         required />
                 </div>
                 <div>
-                    <label htmlFor='imageURL'>URL de l'image</label>
+                    <label htmlFor='image'>Image</label>
                     <input className="form-control"
-                        type='text'
-                        id='imageURL'
-                        name="imageURL"
-                        defaultValue={modalInstance.oldRowObject?.image}
-                        onChange={(e) => { modalInstance.tempRow.image = e.target.value }}
+                        type={"file"}
+                        accept={"image/*"}
+                        id='image'
+                        name="image"
+                        //defaultValue={modalInstance.oldRowObject?.image} SUPP si reste upload image marche
+                        onChange={(e) => { modalInstance.tempRow.image = e.target.files[0]}}
                         required />
                 </div>
             </form>

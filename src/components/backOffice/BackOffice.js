@@ -21,7 +21,7 @@ class BackOffice extends React.Component{
     async componentDidMount(){
         const config = utils.getAPIHeaderWithJWTToken();
         try {
-            const response = await axios.get("http://localhost:3001/v1/backoffice-authorization", config);
+            const response = await axios.get("http://localhost:3001/v1/user/backoffice-authorization", config);
             if (response.status === 200) {
                 this.setState({ isUserAuthorized: true });
             }

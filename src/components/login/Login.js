@@ -54,6 +54,8 @@ class Login extends React.Component{
             if(response){
                 localStorage.setItem("jwt", response.data); //stocke le token dans le localstorage
                 this.componentDidMount();
+            }else{
+                this.setState({ loginErrorMessage : "Impossible de  !" })
             }
         }catch(error){
             if(error.response && error.response.status === 404){

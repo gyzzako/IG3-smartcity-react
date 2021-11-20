@@ -28,7 +28,7 @@ export function getUserForm(modalInstance){
                 <div>
                     <label htmlFor='phoneNumber'>Téléphone</label>
                     <input className="form-control"
-                        type='text'
+                        type='number'
                         id='phoneNumber'
                         name="phoneNumber"
                         defaultValue={modalInstance.oldRowObject?.phone_number}

@@ -14,6 +14,7 @@ class TableModal extends React.Component{
             saveModifications: props.saveModificationsCallback,
             addNewRow: props.addNewRowCallback,
             chosenTable: props.chosenTable,
+            modalErrorMessage: props.modalErrorMessage,
             form: {
                 formContent: undefined,
                 isFormValid: undefined,
@@ -81,6 +82,7 @@ class TableModal extends React.Component{
 
             </Modal.Body>
             <Modal.Footer>
+                <p>{this.state.modalErrorMessage}</p>
                 <Button variant="secondary" onClick={() => this.closeModal()}>
                     Fermer
                 </Button>

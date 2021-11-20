@@ -3,26 +3,23 @@ const {fromDDMMYYYYToYYYYMMDD} = require('./dateFormatConverter');
 module.exports.formatObject = (rowOfTableName, modifiedObject) => {
     if(rowOfTableName === "meal"){
         let rowForAPI = {...modifiedObject};
+
         rowForAPI.publication_date = fromDDMMYYYYToYYYYMMDD(rowForAPI.publication_date); //formatage date pour DB
 
-        rowForAPI.category = {
-            id: rowForAPI.category_fk
-        };
-        delete rowForAPI.category_fk;
+        //formdata pour passer l'image
+        const formData = new FormData();
+        formData.append('id', rowForAPI.id);
+        formData.append('name', rowForAPI.name);
+        formData.append('description', rowForAPI.description);
+        formData.append('portion_number', rowForAPI.portion_number);
+        formData.append('publication_date', rowForAPI.publication_date); //formatage date pour DB
+        formData.append('user_fk', rowForAPI.user_fk);
+        formData.append('category_fk', rowForAPI.category_fk);
+        if(rowForAPI.order_fk !== undefined) formData.append('order_fk', rowForAPI.order_fk);
+        formData.append('image', rowForAPI.image);
+        formData.append('oldImageName', rowForAPI.oldImageName);
     
-        rowForAPI.user =  {
-            id: rowForAPI.user_fk
-        };
-        delete rowForAPI.user_fk;
-    
-        if(rowForAPI.order_fk !== undefined){ //pcq order n'est pas obligatoire
-            rowForAPI.order =  {
-                id: rowForAPI.order_fk
-            };
-        }
-        delete rowForAPI.order_fk;
-    
-        return rowForAPI;
+        return formData;
     }else if(rowOfTableName === "user"){
         let rowForAPI = {...modifiedObject};
 
@@ -41,9 +38,7 @@ module.exports.formatObject = (rowOfTableName, modifiedObject) => {
     
         return rowForAPI;
     }else if(rowOfTableName === "category"){
-        let rowForAPI = {...modifiedObject};
-    
-        return rowForAPI;
+        return modifiedObject; //car pas de modif nécéssaire
     }
     
 }

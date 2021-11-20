@@ -1,9 +1,11 @@
 import React from "react";
 import classes from './BackOffice.module.css';
 import TableModal from "./TableModal";
-import axios from 'axios';
 import objectFormatterForAPI from '../../utils/objectFormatterForAPI';
 import utils from '../../utils/utils';
+import {getFullTableDataFromApi, updateTableRowToAPI,
+        getTableRowByIdFromAPI, deleteTableRowToAPI,
+        postTableRowToAPI} from '../../API/index';
 
 class Table extends React.Component{
     constructor(props){
@@ -13,13 +15,14 @@ class Table extends React.Component{
             tableRows: undefined,
             rowsToShow: undefined,
             showModal: false,
-            showTable: false
+            showTable: false,
         }
+        this.apiBasicErrorMessage = "Erreur lors de l'accès à l'API";
         this.rowObjectToModify = undefined
 
         //nom de colonnes perso pour chaque colonne dans les tables
         this.userTableColumnsName = [{id: "Id"}, {firstname: "Prénom"}, {lastname: "Nom"}, {phone_number: "Téléphone"}, {username: "Pseudo"}, {password: "Mot de passe"}, {isadmin: "Administrateur"}, {province: "Province"}, {city:"Ville"}, {street_and_number:"Rue et numéro"}];
-        this.mealTableColumnsName = [{id: "Id"}, {name: "Nom"}, {description: "Description"}, {portion_number: "Nombre de portion"}, {publication_date: "Date de publication"}, {user_fk: "Id de l'utilisateur"}, {category_fk: "Id de la categorie"}, {order_fk: "Id de la commande"}, {image:"URL de l'image"}]; 
+        this.mealTableColumnsName = [{id: "Id"}, {name: "Nom"}, {description: "Description"}, {portion_number: "Nombre de portion"}, {publication_date: "Date de publication"}, {user_fk: "Id de l'utilisateur"}, {category_fk: "Id de la categorie"}, {order_fk: "Id de la commande"}, {image:"Nom de l'image"}]; 
         this.orderTableColumnsName = [{id: "Id"}, {order_date: "Date de la commande"}, {user_fk: "Id de l'utilisateur"}]
         this.categoryTableColumnsName = [{id: "Id"}, {name: "Nom"}]
 
@@ -44,14 +47,15 @@ class Table extends React.Component{
         if(this.state.chosenTable !== undefined){
             const config = utils.getAPIHeaderWithJWTToken();
             try{
-                const {data} = await axios.get(`http://localhost:3001/v1/${this.state.chosenTable}`, config);
+                const {data} = await getFullTableDataFromApi(this.state.chosenTable, config);
                 const rowsData = data;
                 if(rowsData !== undefined){
                     this.setState({tableRows: rowsData, rowsToShow: undefined, showTable: true});
                 }
             }catch(e){
-                alert("API unreachable");
-                console.error(e.response.status);
+                const errorMessage = e.response?.data?.error || this.apiBasicErrorMessage;
+                alert(errorMessage);
+                console.error(e?.response?.statusText);
             }
         }
     }
@@ -162,29 +166,29 @@ class Table extends React.Component{
                 const rowForAPI = objectFormatterForAPI.formatObject(this.state.chosenTable, modifiedObject);
 
                 const config = utils.getAPIHeaderWithJWTToken();
-                const response = await axios.patch(`http://localhost:3001/v1/${this.state.chosenTable}`, rowForAPI, config)
-                if(response?.status === 204){
+                const patchResponse = await updateTableRowToAPI(this.state.chosenTable, rowForAPI, config);
+                if(patchResponse?.status === 204){
                     const id = modifiedObject.id;
-                    let iTableRow;
-                    //update table in react
-                    iTableRow = this.state.tableRows.findIndex(row => row.id === id);
-                    this.state.tableRows.splice(iTableRow, 1, modifiedObject)
-
-                    //update searchTable in react
-                    if(this.state.rowsToShow !== undefined){
-                        iTableRow = this.state.rowsToShow.findIndex(row => row.id === id);
-                        this.state.rowsToShow.splice(iTableRow, 1, modifiedObject)
-                        this.setState({rowsToShow: this.state.rowsToShow});
+                    const {data} = await getTableRowByIdFromAPI(this.state.chosenTable, id, config)
+                    const rowsData = data[0];
+                    if (rowsData !== undefined) {
+                        // pour de meilleures performances on récup seulement le user updated pour update le tableau contenant tous les users
+                        this.updateLocalTableAfterModifications(id, rowsData);
+                    }else{//si on arrive pas à récup seulement le user updated, on récupère tous les users
+                        this.getTableRowsFromAPI()
                     }
                 }else{
-                    alert("Couldn't update database")
+                    alert("Les modifications n'ont pas pu être enregistrées. Réessayez !");
                 }
+                this.closeModal();
             }catch(e){
-                alert("Error while reaching API");
-                console.error(e.response.status);
+                const errorMessage = e.response?.data?.error || this.apiBasicErrorMessage;
+                alert(errorMessage);
+                console.error(e?.response?.statusText);
             }
+        }else{
+            this.closeModal();
         }
-        this.closeModal();
     }
 
     isOldAndNewRowEqual(object1, object2) { //A modifier si on change la structure de modifiedObject -> CAD si une key est un objet lui aussi
@@ -203,26 +207,41 @@ class Table extends React.Component{
         }
         try{
             const config = utils.getAPIHeaderWithJWTToken();
-            const response = await axios.delete(`http://localhost:3001/v1/${this.state.chosenTable}`, {data: idForAPI, headers: config.headers}); //TODO: quand on met une fk qui n'exite pas pour order, category ou user -> pas de response mais direct dans le catch (pareil pour patch)
+            const response = await deleteTableRowToAPI(this.state.chosenTable, idForAPI, config); //TODO: quand on met une fk qui n'exite pas pour order, category ou user -> pas de response mais direct dans le catch (pareil pour patch)
             if(response?.status === 204){
-                //update table in react
-                let iTableRow;
-                iTableRow = this.state.tableRows.findIndex(row => row.id === id);
-                this.state.tableRows.splice(iTableRow, 1);
-                this.setState({tableRows: this.state.tableRows});
-
-                //update searchTable in react
-                if(this.state.rowsToShow !== undefined){
-                    iTableRow = this.state.rowsToShow.findIndex(row => row.id === id);
-                    this.state.rowsToShow.splice(iTableRow, 1)
-                    this.setState({rowsToShow: this.state.rowsToShow});
-                }
+                //pour de meilleures performances on récup ne récupère pas tous les users, on modifie en local
+                this.updateLocalTableAfterModifications(id);
             }else{
-                alert("Couldn't update database")
+                alert("La suppresion n'a pas pu être réalisée. Réessayez !")
             }
         }catch(e){
-            alert("Error while reaching API");
-            console.error(e.response.status);
+            const errorMessage = e.response?.data?.error || this.apiBasicErrorMessage;
+            alert(errorMessage);
+            console.error(e?.response?.statusText);
+        }
+    }
+
+    updateLocalTableAfterModifications(idToFind, rowsData){//si rowData !== undefined => c'est que cette méthode a été appellée depuis 'saveModificationsModal' sinon de 'deleteRow'
+        let iTableRow;
+
+        //update table in react
+        iTableRow = this.state.tableRows.findIndex(row => row.id === idToFind);
+        if(rowsData !== undefined){
+            this.state.tableRows.splice(iTableRow, 1, rowsData); //ré-insère la ligne modifiée dans le tableau au bon endroit
+        }else{
+            this.state.tableRows.splice(iTableRow, 1); //supprime la ligne supprimée dans le tableau
+        }
+        this.setState({tableRows: this.state.tableRows});
+
+        //update searchTable in react
+        if(this.state.rowsToShow !== undefined){
+            iTableRow = this.state.rowsToShow.findIndex(row => row.id === idToFind);
+            if(rowsData !== undefined){
+                this.state.rowsToShow.splice(iTableRow, 1, rowsData) //ré-insère la ligne modifiée dans le tableau au bon endroit
+            }else{
+                this.state.rowsToShow.splice(iTableRow, 1) //supprime la ligne supprimée dans le tableau
+            }
+            this.setState({rowsToShow: this.state.rowsToShow});
         }
     }
 
@@ -231,18 +250,20 @@ class Table extends React.Component{
             const rowForAPI = objectFormatterForAPI.formatObject(this.state.chosenTable, newRowObject);
 
             const config = utils.getAPIHeaderWithJWTToken();
-            const response = await axios.post(`http://localhost:3001/v1/${this.state.chosenTable}`, rowForAPI, config);
+            const response = await postTableRowToAPI(this.state.chosenTable, rowForAPI, config);
             if(response?.status === 201){
                 //update table in react
-                this.getTableRowsFromAPI()
+                this.getTableRowsFromAPI();
             }else{
-                alert("Couldn't update database");
+                alert("L'ajout n'a pas pu être réalisée. Réessayez !");
             }
+            this.closeModal();
         }catch(e){
-            alert("Error while reaching API");
-            console.error(e.response.status);
+            const errorMessage = e.response?.data?.error || this.apiBasicErrorMessage;
+            alert(errorMessage);
+            console.error(e?.response?.statusText);
         }
-        this.closeModal();
+        
     }
 }
 
