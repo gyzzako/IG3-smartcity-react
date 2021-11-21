@@ -1,7 +1,6 @@
 import React from "react";
 import logo from "../../assets/images/logo-food.png";
 import classes from './Login.module.css';
-import Header from "../header/Header";
 import {loginUserWithAPI} from '../../API/index';
 
 class Login extends React.Component{
@@ -83,7 +82,7 @@ class Login extends React.Component{
         if(this.state.userData !== undefined){
             return(
                 <div className="text-center">
-                    <Header />  
+                    
                     <section className={classes.auth}>
                         <h1>Bonjour</h1>
                         <h2>{this.state.userData.firstname + " " + this.state.userData.lastname}</h2>
@@ -98,7 +97,7 @@ class Login extends React.Component{
             //pas connecté
             return(
                 <div className="text-center">
-                    <Header />
+                   
                     <section className={classes.auth}>
                         <h1>Se connecter</h1>
                         <img className="mb-4 " src={logo} alt="" width="100" height="100"/>

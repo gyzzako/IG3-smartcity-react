@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../header/Header";
 import ActionBar from "./ActionBar";
 import classes from './BackOffice.module.css';
 import Table from "./Table";
@@ -44,7 +43,7 @@ class BackOffice extends React.Component{
         if(this.state.isUserAuthorized){
             return(
                 <>
-                    <Header />
+                    
                     <div className={classes.backOffice}>
                         <ActionBar chosenTableCallback={(tableName) => this.displayTable(tableName)}/>
                         <Table key={this.state.chosenTable} chosenTable={this.state.chosenTable} />
@@ -54,7 +53,7 @@ class BackOffice extends React.Component{
         }else{
             return(
                 <>
-                    <Header />
+                    
                     <p>{this.state.errorMessage}</p>
                 </>
             );

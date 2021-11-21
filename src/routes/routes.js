@@ -4,27 +4,36 @@ import {
     Switch,
     Route,
 } from "react-router-dom";
+import Header from '../components/header/Header';
 const BackOffice = lazy(() => import ("../components/backOffice/BackOffice"));
 const Login = lazy(() => import ("../components/login/Login"));
+
 
 export default function Routes(){
     return(
         <Router>
-            <Suspense fallback={<div>Chargement...</div>}>
                 <Switch>
                 <Route path="/connexion">
-                    <Login/>
+                    <Header/>
+                    <Suspense fallback={<div>Chargement...</div>}>
+                        <Login/>
+                    </Suspense>
                 </Route>
 
                 <Route path="/administration">
+                    <Header/>
+                    <Suspense fallback={<div>Chargement...</div>}>
                     <BackOffice/>
+                    </Suspense>
                 </Route>
 
                 <Route path="/">
-                    <Login/>
+                    <Header/>
+                    <Suspense fallback={<div>Chargement...</div>}>
+                        <Login/>
+                    </Suspense>
                 </Route>
                 </Switch>
-            </Suspense>
         </Router>
     );
 }
