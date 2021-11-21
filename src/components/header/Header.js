@@ -14,7 +14,7 @@ const Header =() =>{
                     <li>
                         <NavLink activeClassName={classes.active} to="/" isActive={(match, location) => {
                             if (!match) return false;
-                            if(match.url === "/connexion" || match.url === "/"){
+                            if(location.pathname === "/connexion" || location.pathname === "/"){
                                 return true;
                             }
                         }}>Connexion</NavLink>

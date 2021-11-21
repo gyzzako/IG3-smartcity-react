@@ -5,6 +5,7 @@ import {getUserForm, isUserFormValid} from './modalForms/userForm';
 import {getOrderForm, isOrderFormValid} from './modalForms/orderForm';
 import {getCategoryForm, isCategoryFormValid} from './modalForms/categoryForm';
 import Modal from 'react-bootstrap/Modal';
+import PropTypes from 'prop-types';
 
 class TableModal extends React.Component{
     constructor(props){
@@ -14,7 +15,6 @@ class TableModal extends React.Component{
             saveModifications: props.saveModificationsCallback,
             addNewRow: props.addNewRowCallback,
             chosenTable: props.chosenTable,
-            modalErrorMessage: props.modalErrorMessage,
             form: {
                 formContent: undefined,
                 isFormValid: undefined,
@@ -94,6 +94,14 @@ class TableModal extends React.Component{
             </>
         );
     }
+}
+
+TableModal.propTypes = {
+    closeModalCallback: PropTypes.func.isRequired,
+    saveModificationsCallback: PropTypes.func.isRequired,
+    addNewRowCallback: PropTypes.func.isRequired,
+    chosenTable: PropTypes.string,
+    rowObjectToModify: PropTypes.object
 }
 
 export default TableModal;

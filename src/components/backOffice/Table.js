@@ -2,10 +2,13 @@ import React from "react";
 import classes from './BackOffice.module.css';
 import TableModal from "./TableModal";
 import objectFormatterForAPI from '../../utils/objectFormatterForAPI';
-import utils from '../../utils/utils';
+import {getAPIHeaderWithJWTToken, getErrorMessageWithAPI} from '../../utils/utils';
 import {getFullTableDataFromApi, updateTableRowToAPI,
         getTableRowByIdFromAPI, deleteTableRowToAPI,
         postTableRowToAPI} from '../../API/index';
+import PropTypes from 'prop-types';
+import {userHasToRelog} from '../../utils/utils';
+import { Redirect } from "react-router-dom";
 
 class Table extends React.Component{
     constructor(props){
@@ -16,8 +19,8 @@ class Table extends React.Component{
             rowsToShow: undefined,
             showModal: false,
             showTable: false,
+            redirectToLogin: false
         }
-        this.apiBasicErrorMessage = "Erreur lors de l'accès à l'API";
         this.rowObjectToModify = undefined
 
         //nom de colonnes perso pour chaque colonne dans les tables
@@ -45,7 +48,7 @@ class Table extends React.Component{
     
     async getTableRowsFromAPI(){
         if(this.state.chosenTable !== undefined){
-            const config = utils.getAPIHeaderWithJWTToken();
+            const config = getAPIHeaderWithJWTToken();
             try{
                 const {data} = await getFullTableDataFromApi(this.state.chosenTable, config);
                 const rowsData = data;
@@ -53,14 +56,19 @@ class Table extends React.Component{
                     this.setState({tableRows: rowsData, rowsToShow: undefined, showTable: true});
                 }
             }catch(e){
-                const errorMessage = e.response?.data?.error || this.apiBasicErrorMessage;
+                const errorMessage = getErrorMessageWithAPI(e.response);
                 alert(errorMessage);
-                console.error(e?.response?.statusText);
+                console.error(e);
+                if(userHasToRelog()){
+                    this.setState({redirectToLogin: true});
+                }
             }
         }
     }
 
     render(){
+        if(this.state.redirectToLogin) return <Redirect to="/connexion"/>
+
         let table;
         switch(this.state.chosenTable){
             case "meal":
@@ -165,7 +173,7 @@ class Table extends React.Component{
             try{
                 const rowForAPI = objectFormatterForAPI.formatObject(this.state.chosenTable, modifiedObject);
 
-                const config = utils.getAPIHeaderWithJWTToken();
+                const config = getAPIHeaderWithJWTToken();
                 const patchResponse = await updateTableRowToAPI(this.state.chosenTable, rowForAPI, config);
                 if(patchResponse?.status === 204){
                     const id = modifiedObject.id;
@@ -182,9 +190,12 @@ class Table extends React.Component{
                 }
                 this.closeModal();
             }catch(e){
-                const errorMessage = e.response?.data?.error || this.apiBasicErrorMessage;
+                const errorMessage = getErrorMessageWithAPI(e.response);
                 alert(errorMessage);
-                console.error(e?.response?.statusText);
+                console.error(e);
+                if(userHasToRelog()){
+                    this.setState({redirectToLogin: true});
+                }
             }
         }else{
             this.closeModal();
@@ -206,7 +217,7 @@ class Table extends React.Component{
             id: id
         }
         try{
-            const config = utils.getAPIHeaderWithJWTToken();
+            const config = getAPIHeaderWithJWTToken();
             const response = await deleteTableRowToAPI(this.state.chosenTable, idForAPI, config); //TODO: quand on met une fk qui n'exite pas pour order, category ou user -> pas de response mais direct dans le catch (pareil pour patch)
             if(response?.status === 204){
                 //pour de meilleures performances on récup ne récupère pas tous les users, on modifie en local
@@ -215,9 +226,12 @@ class Table extends React.Component{
                 alert("La suppresion n'a pas pu être réalisée. Réessayez !")
             }
         }catch(e){
-            const errorMessage = e.response?.data?.error || this.apiBasicErrorMessage;
+            const errorMessage = getErrorMessageWithAPI(e.response);
             alert(errorMessage);
-            console.error(e?.response?.statusText);
+            console.error(e);
+            if(userHasToRelog()){
+                this.setState({redirectToLogin: true});
+            }
         }
     }
 
@@ -249,22 +263,29 @@ class Table extends React.Component{
         try{
             const rowForAPI = objectFormatterForAPI.formatObject(this.state.chosenTable, newRowObject);
 
-            const config = utils.getAPIHeaderWithJWTToken();
+            const config = getAPIHeaderWithJWTToken();
             const response = await postTableRowToAPI(this.state.chosenTable, rowForAPI, config);
             if(response?.status === 201){
                 //update table in react
                 this.getTableRowsFromAPI();
             }else{
-                alert("L'ajout n'a pas pu être réalisée. Réessayez !");
+                alert("L'ajout n'a pas pu être réalisé. Réessayez !");
             }
             this.closeModal();
         }catch(e){
-            const errorMessage = e.response?.data?.error || this.apiBasicErrorMessage;
+            const errorMessage = getErrorMessageWithAPI(e.response);
             alert(errorMessage);
-            console.error(e?.response?.statusText);
+            console.error(e);
+            if(userHasToRelog()){
+                this.setState({redirectToLogin: true});
+            }
         }
         
     }
+}
+
+Table.propTypes = {
+    chosenTable: PropTypes.string
 }
 
 export default Table;

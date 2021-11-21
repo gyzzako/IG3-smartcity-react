@@ -2,6 +2,7 @@ import React from "react";
 import classes from './BackOffice.module.css';
 import './css.css';
 import {Navbar, Container} from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 
 class ActionBar extends React.Component{
@@ -41,5 +42,8 @@ class ActionBar extends React.Component{
         )
     }
 }
+ActionBar.propTypes = {
+    chosenTableCallback: PropTypes.func.isRequired
+};
 
 export default ActionBar;

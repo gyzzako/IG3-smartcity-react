@@ -2,7 +2,7 @@ import React from "react";
 import logo from "../../assets/images/logo-food.png";
 import classes from './Login.module.css';
 import Header from "../header/Header";
-import axios from "axios";
+import {loginUserWithAPI} from '../../API/index';
 
 class Login extends React.Component{
     constructor() {
@@ -50,7 +50,7 @@ class Login extends React.Component{
         };
 
         try{
-            const response = await axios.post('http://localhost:3001/v1/user/login', data);
+            const response = await loginUserWithAPI(data);
             if(response){
                 localStorage.setItem("jwt", response.data); //stocke le token dans le localstorage
                 this.componentDidMount();
