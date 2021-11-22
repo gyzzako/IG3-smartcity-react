@@ -2,6 +2,7 @@ import React from "react";
 import logo from "../../assets/images/logo-food.png";
 import classes from './Login.module.css';
 import {loginUserWithAPI} from '../../API/index';
+import {isLocalStorageAvailable} from '../../utils/utils';
 
 class Login extends React.Component{
     constructor() {
@@ -51,8 +52,8 @@ class Login extends React.Component{
         try{
             const response = await loginUserWithAPI(data);
             if(response){
-                localStorage.setItem("jwt", response.data); //stocke le token dans le localstorage
-                this.componentDidMount();
+                if(isLocalStorageAvailable()) localStorage.setItem("jwt", response.data); //stocke le token dans le localstorage
+                this.retreiveUserDataFromLocalStorage();
             }else{
                 this.setState({ loginErrorMessage : "Impossible de  !" })
             }
@@ -70,6 +71,10 @@ class Login extends React.Component{
     }
 
     componentDidMount(){
+        this.retreiveUserDataFromLocalStorage()
+    }
+
+    retreiveUserDataFromLocalStorage(){
         this.jwtToken = localStorage.getItem("jwt");
         if(this.jwtToken !== null){
             const jwtPayloadBase64 = this.jwtToken.split(".")[1];

@@ -24,7 +24,7 @@ class Table extends React.Component{
         this.rowObjectToModify = undefined
 
         //nom de colonnes perso pour chaque colonne dans les tables
-        this.userTableColumnsName = [{id: "Id"}, {firstname: "Prénom"}, {lastname: "Nom"}, {phone_number: "Téléphone"}, {username: "Pseudo"}, {password: "Mot de passe"}, {isadmin: "Administrateur"}, {province: "Province"}, {city:"Ville"}, {street_and_number:"Rue et numéro"}];
+        this.userTableColumnsName = [{id: "Id"}, {firstname: "Prénom"}, {lastname: "Nom"}, {phone_number: "Téléphone"}, {username: "Pseudo"}, {isadmin: "Administrateur"}, {province: "Province"}, {city:"Ville"}, {street_and_number:"Rue et numéro"}];
         this.mealTableColumnsName = [{id: "Id"}, {name: "Nom"}, {description: "Description"}, {portion_number: "Nombre de portion"}, {publication_date: "Date de publication"}, {user_fk: "Id de l'utilisateur"}, {category_fk: "Id de la categorie"}, {order_fk: "Id de la commande"}, {image:"Nom de l'image"}]; 
         this.orderTableColumnsName = [{id: "Id"}, {order_date: "Date de la commande"}, {user_fk: "Id de l'utilisateur"}]
         this.categoryTableColumnsName = [{id: "Id"}, {name: "Nom"}]
@@ -73,19 +73,19 @@ class Table extends React.Component{
         switch(this.state.chosenTable){
             case "meal":
                 table = this.createTable(this.mealTableColumnsName);
-                this.check = (row, research) => {return row.name?.toLowerCase().includes(research.toLowerCase()) || row.description?.toLowerCase().includes(research.toLowerCase())};
+                this.check = (row, research) => {return row.id === parseInt(research) || row.name?.toLowerCase().includes(research.toLowerCase()) || row.description?.toLowerCase().includes(research.toLowerCase())};
                 break;
             case "user":
                 table = this.createTable(this.userTableColumnsName);
-                this.check = (row, research) => {return row.firstname?.toLowerCase().includes(research.toLowerCase()) || row.lastname?.toLowerCase().includes(research.toLowerCase()) || row.username?.toLowerCase().includes(research.toLowerCase())};
+                this.check = (row, research) => {return row.id === parseInt(research) || row.firstname?.toLowerCase().includes(research.toLowerCase()) || row.lastname?.toLowerCase().includes(research.toLowerCase()) || row.username?.toLowerCase().includes(research.toLowerCase())};
                 break;
             case "order":
                 table = this.createTable(this.orderTableColumnsName);
-                this.check = (row, research) => {return row.order_date?.toLowerCase().includes(research.toLowerCase())};
+                this.check = (row, research) => {return row.id === parseInt(research) || row.order_date?.toLowerCase().includes(research.toLowerCase())};
                 break;
             case "category":
                 table = this.createTable(this.categoryTableColumnsName);
-                this.check = (row, research) => {return row.name?.toLowerCase().includes(research.toLowerCase())};
+                this.check = (row, research) => {return row.id === parseInt(research) || row.name?.toLowerCase().includes(research.toLowerCase())};
                 break;
             default:
                 table = undefined;
@@ -164,6 +164,9 @@ class Table extends React.Component{
             return <td key={index}>Oui</td>
         }else if(typeof(rowObject[property]) === "boolean" && rowObject[property] === false){
             return <td key={index}>Non</td>
+        }else if(index === 8 && rowObject?.image !== undefined && rowObject.image.endsWith('.jpeg')){ // 8 car l'image se trouve à la 9e colonne //TODO: faire dynamiquement ? 
+            const imgTag = <img src={`http://localhost:3001/mealimages/${rowObject.image}`} alt="meal" width="200" height="185"/>;
+            return <td key={index}>{imgTag}</td>
         }
         return <td key={index}>{rowObject[property]}</td>
     }
