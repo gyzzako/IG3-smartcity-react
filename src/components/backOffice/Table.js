@@ -9,6 +9,7 @@ import {getFullTableDataFromApi, updateTableRowToAPI,
 import PropTypes from 'prop-types';
 import {userHasToRelog} from '../../utils/utils';
 import { Redirect } from "react-router-dom";
+import {mealTableBodyMapper} from './tableContent/meal';
 
 class Table extends React.Component{
     constructor(props){
@@ -144,12 +145,12 @@ class Table extends React.Component{
                             return (
                                 <tr className={classes.tableRow} key={index}>
                                     <td>
-                                        <button className="btn" onClick={() => { //modify button
+                                        <button className="btn far fa-edit" onClick={() => { //modify button
                                             this.showModal(rowObject);
-                                        }}><i className="far fa-edit"></i></button>
-                                        <button className="btn" onClick={() => this.deleteRow(rowObject.id)}><i className="far fa-trash-alt"></i></button>
+                                        }}></button>
+                                        <button className="btn far fa-trash-alt" onClick={() => this.deleteRow(rowObject.id)}></button>
                                     </td>
-                                    {columnsNameObject.map((columnObject, index) => { return (this.tableCellFormatted(rowObject, columnObject, index)) })}
+                                    {mealTableBodyMapper(rowObject)}
                                 </tr>
                             );
                         })}
@@ -158,21 +159,22 @@ class Table extends React.Component{
         }
     }
 
-    tableCellFormatted(rowObject, columnObject, index){//formate la celulle du tableau si c'est une date ou un bool
+   /*  tableCellFormatted(rowObject, columnObject, index){//formate la celulle du tableau si c'est une date ou un bool
         const property = Object.keys(columnObject)[0];
         if(typeof(rowObject[property]) === "boolean" && rowObject[property] === true){
             return <td key={index}>Oui</td>
         }else if(typeof(rowObject[property]) === "boolean" && rowObject[property] === false){
             return <td key={index}>Non</td>
-        }else if(index === 8 && rowObject?.image !== undefined && rowObject.image.endsWith('.jpeg')){ // 8 car l'image se trouve à la 9e colonne //TODO: faire dynamiquement ? 
+        }else if(index === 8 && rowObject?.image !== undefined && rowObject?.image !== null && rowObject.image.endsWith('.jpeg')){ // 8 car l'image se trouve à la 9e colonne //TODO: faire dynamiquement ? 
             const imgTag = <img src={`http://localhost:3001/mealimages/${rowObject.image}`} alt="meal" width="200" height="185"/>;
             return <td key={index}>{imgTag}</td>
         }
         return <td key={index}>{rowObject[property]}</td>
-    }
+    } */
 
     async saveModificationsModal(modifiedObject){
         if(this.rowObjectToModify !== undefined && !this.isOldAndNewRowEqual(this.rowObjectToModify,modifiedObject)){
+            
             try{
                 const rowForAPI = objectFormatterForAPI.formatObject(this.state.chosenTable, modifiedObject);
 
@@ -181,10 +183,10 @@ class Table extends React.Component{
                 if(patchResponse?.status === 204){
                     const id = modifiedObject.id;
                     const {data} = await getTableRowByIdFromAPI(this.state.chosenTable, id, config)
-                    const rowsData = data[0];
-                    if (rowsData !== undefined) {
+                    const rowData = data[0];
+                    if (rowData !== undefined) {
                         // pour de meilleures performances on récup seulement le user updated pour update le tableau contenant tous les users
-                        this.updateLocalTableAfterModifications(id, rowsData);
+                        this.updateLocalTableAfterModifications(id, rowData);
                     }else{//si on arrive pas à récup seulement le user updated, on récupère tous les users
                         this.getTableRowsFromAPI()
                     }
@@ -205,15 +207,25 @@ class Table extends React.Component{
         }
     }
 
-    isOldAndNewRowEqual(object1, object2) { //A modifier si on change la structure de modifiedObject -> CAD si une key est un objet lui aussi
+    isOldAndNewRowEqual(object1, object2) {//check si l'objet à tous les niveaux de profondeur si il est le même
         const keys1 = Object.keys(object1);
-        for (let key of keys1) {
-          if (object1[key] !== object2[key]) {
+        const keys2 = Object.keys(object2);
+        if (keys1.length !== keys2.length) {
+          return false;
+        }
+        for (const key of keys1) {
+          const val1 = object1[key];
+          const val2 = object2[key];
+          const areObjects = this.isObject(val1) && this.isObject(val2);
+          if ((areObjects && !this.deepEqual(val1, val2)) || (!areObjects && val1 !== val2)){
             return false;
           }
         }
         return true;
     }
+    isObject(object) {
+        return object != null && typeof object === 'object';
+      }
     
     async deleteRow(id){ //TODO: supprimer la ligne
         const idForAPI = {
@@ -238,13 +250,13 @@ class Table extends React.Component{
         }
     }
 
-    updateLocalTableAfterModifications(idToFind, rowsData){//si rowData !== undefined => c'est que cette méthode a été appellée depuis 'saveModificationsModal' sinon de 'deleteRow'
+    updateLocalTableAfterModifications(idToFind, rowData){//si rowData !== undefined => c'est que cette méthode a été appellée depuis 'saveModificationsModal' sinon de 'deleteRow'
         let iTableRow;
 
         //update table in react
         iTableRow = this.state.tableRows.findIndex(row => row.id === idToFind);
-        if(rowsData !== undefined){
-            this.state.tableRows.splice(iTableRow, 1, rowsData); //ré-insère la ligne modifiée dans le tableau au bon endroit
+        if(rowData !== undefined){
+            this.state.tableRows.splice(iTableRow, 1, rowData); //ré-insère la ligne modifiée dans le tableau au bon endroit
         }else{
             this.state.tableRows.splice(iTableRow, 1); //supprime la ligne supprimée dans le tableau
         }
@@ -253,8 +265,8 @@ class Table extends React.Component{
         //update searchTable in react
         if(this.state.rowsToShow !== undefined){
             iTableRow = this.state.rowsToShow.findIndex(row => row.id === idToFind);
-            if(rowsData !== undefined){
-                this.state.rowsToShow.splice(iTableRow, 1, rowsData) //ré-insère la ligne modifiée dans le tableau au bon endroit
+            if(rowData !== undefined){
+                this.state.rowsToShow.splice(iTableRow, 1, rowData) //ré-insère la ligne modifiée dans le tableau au bon endroit
             }else{
                 this.state.rowsToShow.splice(iTableRow, 1) //supprime la ligne supprimée dans le tableau
             }

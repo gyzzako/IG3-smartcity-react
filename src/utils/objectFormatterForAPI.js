@@ -5,7 +5,6 @@ module.exports.formatObject = (rowOfTableName, modifiedObject) => {
         let rowForAPI = {...modifiedObject};
 
         rowForAPI.publication_date = fromDDMMYYYYToYYYYMMDD(rowForAPI.publication_date); //formatage date pour DB
-
         //formdata pour passer l'image
         const formData = new FormData();
         formData.append('id', rowForAPI.id);
@@ -14,7 +13,7 @@ module.exports.formatObject = (rowOfTableName, modifiedObject) => {
         formData.append('portion_number', rowForAPI.portion_number);
         formData.append('publication_date', rowForAPI.publication_date); //formatage date pour DB
         formData.append('user_fk', rowForAPI.user_fk);
-        formData.append('category_fk', rowForAPI.category_fk);
+        formData.append('category_fk', rowForAPI.category.id);
         if(rowForAPI.order_fk !== undefined) formData.append('order_fk', rowForAPI.order_fk);
         formData.append('image', rowForAPI.image);
         formData.append('oldImageName', rowForAPI.oldImageName);

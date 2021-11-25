@@ -25,10 +25,13 @@ class TableModal extends React.Component{
         this.tempRow = {...props.rowObjectToModify}; //crée un nouvel objet mais avec les meme attributs
         this.isUsedForAModification = props.rowObjectToModify !== undefined ? true : false;
 
+    }    
+    async componentDidMount(){
         switch(this.state.chosenTable){
             case "meal":
-                this.state.form.formContent = getMealForm(this);
+                this.state.form.formContent = await getMealForm(this);
                 this.state.form.isFormValid = isMealFormValid;
+                this.setState({});
                 break;
             case "user":
                 this.state.form.formContent = getUserForm(this);
@@ -45,7 +48,8 @@ class TableModal extends React.Component{
             default:
                 this.state.form.errorMessage = "Error: Table not found !";
         }
-    }    
+
+    }
 
     closeModal(){
         this.state.closeModal();

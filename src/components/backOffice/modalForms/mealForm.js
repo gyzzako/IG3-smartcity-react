@@ -1,7 +1,9 @@
 import classes from '../BackOffice.module.css';
 import {fromYYYYMMDDToDDMMYYYY, fromDDMMYYYYToYYYYMMDD} from '../../../utils/dateFormatConverter';
+import { getAPIHeaderWithJWTToken } from '../../../utils/utils';
+import axios from 'axios';
 
-export function getMealForm(modalInstance){
+export async function getMealForm(modalInstance){
     let date;
     if (modalInstance.oldRowObject !== undefined) {
         date = fromDDMMYYYYToYYYYMMDD(modalInstance.oldRowObject.publication_date);
@@ -10,6 +12,16 @@ export function getMealForm(modalInstance){
         modalInstance.tempRow.publication_date = date;
     }
     modalInstance.tempRow.oldImageName = modalInstance.oldRowObject?.image;
+
+    const config = getAPIHeaderWithJWTToken();
+    const {data: categories} = await axios.get("http://localhost:3001/v1/category", config);
+
+    const categoryOptions = categories.map(category => {
+        return (
+            <option category_id={category.id} key={category.id}>{category.name}</option>
+        );
+    })
+
     return (
         <>
             <form className={classes.form}>
@@ -62,15 +74,14 @@ export function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='categoryId'>Id de la catégorie</label>
-                    <input className="form-control"
-                        type='number'
-                        id='categoryId'
-                        name="categoryId"
-                        min="0"
-                        defaultValue={modalInstance.oldRowObject?.category_fk}
-                        onChange={(e) => { modalInstance.tempRow.category_fk = parseInt(e.target.value) }}
-                        required />
+                    <label htmlFor='categoryName'>Id de la catégorie</label>
+                    <select defaultValue={modalInstance.oldRowObject?.category?.name} onChange={(e) => { 
+                                        const selectedIndex = e.target.options.selectedIndex;
+                                        modalInstance.tempRow.category.id = e.target.options[selectedIndex].getAttribute('category_id');
+                                        modalInstance.tempRow.category.name = e.target.value;}}
+                                        className="form-control" name="pets" id="pet-select">
+                        {categoryOptions}
+                    </select>
                 </div>
                 <div>
                     <label htmlFor='orderId'>Id de la commande</label>
@@ -106,7 +117,7 @@ export function isMealFormValid(rowObject){
     if(rowObject.portion_number < 1) throw new Error("Entrez un nombre de portion supérieur à 0");
     if(rowObject.publication_date === undefined || rowObject.publication_date === "") throw new Error("Entrez une date valide");
     if(rowObject.user_fk === undefined || isNaN(rowObject.user_fk)) throw new Error("Entrez un utilisateur valide");
-    if(rowObject.category_fk === undefined || isNaN(rowObject.category_fk)) throw new Error("Entrez une categorie valide");
+    if(rowObject.category.id === undefined || isNaN(rowObject.category.id)) throw new Error("Entrez une categorie valide");
     if(rowObject.image === undefined || rowObject.image === "") throw new Error("Entrez un lien d'image valide");
 
     //formatage date
