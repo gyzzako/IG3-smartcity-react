@@ -14,9 +14,9 @@ module.exports.formatObject = (rowOfTableName, modifiedObject) => {
         formData.append('publication_date', rowForAPI.publication_date); //formatage date pour DB
         formData.append('user_fk', rowForAPI.user_fk);
         formData.append('category_fk', rowForAPI.category.id);
-        if(rowForAPI.order_fk !== undefined) formData.append('order_fk', rowForAPI.order_fk);
+        if(rowForAPI.order_fk !== undefined && rowForAPI.order_fk !== null) formData.append('order_fk', rowForAPI.order_fk);
         formData.append('image', rowForAPI.image);
-        formData.append('oldImageName', rowForAPI.oldImageName);
+        if(rowForAPI.oldImageName !== undefined && rowForAPI.oldImageName !== null) formData.append('oldImageName', rowForAPI.oldImageName);
     
         return formData;
     }else if(rowOfTableName === "user"){
@@ -28,6 +28,7 @@ module.exports.formatObject = (rowOfTableName, modifiedObject) => {
         return rowForAPI;
     }else if(rowOfTableName === "order"){
         let rowForAPI = {...modifiedObject};
+
         rowForAPI.order_date = fromDDMMYYYYToYYYYMMDD(rowForAPI.order_date); //formatage date pour DB
 
         rowForAPI.user = {

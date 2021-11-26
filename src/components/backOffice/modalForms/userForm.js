@@ -1,7 +1,7 @@
 import classes from '../BackOffice.module.css';
 
 export function getUserForm(modalInstance){
-    modalInstance.tempRow.isadmin = modalInstance.oldRowObject.isadmin ? true : false;
+    modalInstance.tempRow.isadmin = modalInstance.oldRowObject?.isadmin ? true : false;
     return (
         <>
             <form className={classes.form}>

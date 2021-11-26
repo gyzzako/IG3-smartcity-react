@@ -9,7 +9,10 @@ import {getFullTableDataFromApi, updateTableRowToAPI,
 import PropTypes from 'prop-types';
 import {userHasToRelog} from '../../utils/utils';
 import { Redirect } from "react-router-dom";
-import {mealTableBodyMapper} from './tableContent/meal';
+import {tableBodyMapper as mealTableBodyMapper} from './tableContent/meal';
+import {tableBodyMapper as userTableBodyMapper} from './tableContent/user';
+import {tableBodyMapper as orderTableBodyMapper} from './tableContent/order';
+import {tableBodyMapper as categoryTableBodyMapper} from './tableContent/category';
 
 class Table extends React.Component{
     constructor(props){
@@ -26,11 +29,12 @@ class Table extends React.Component{
 
         //nom de colonnes perso pour chaque colonne dans les tables
         this.userTableColumnsName = [{id: "Id"}, {firstname: "Prénom"}, {lastname: "Nom"}, {phone_number: "Téléphone"}, {username: "Pseudo"}, {isadmin: "Administrateur"}, {province: "Province"}, {city:"Ville"}, {street_and_number:"Rue et numéro"}];
-        this.mealTableColumnsName = [{id: "Id"}, {name: "Nom"}, {description: "Description"}, {portion_number: "Nombre de portion"}, {publication_date: "Date de publication"}, {user_fk: "Id de l'utilisateur"}, {category_fk: "Id de la categorie"}, {order_fk: "Id de la commande"}, {image:"Nom de l'image"}]; 
+        this.mealTableColumnsName = [{id: "Id"}, {name: "Nom"}, {description: "Description"}, {portion_number: "Nombre de portion"}, {publication_date: "Date de publication"}, {user_fk: "Id de l'utilisateur"}, {category_fk: "Categorie"}, {order_fk: "Id de la commande"}, {image:"Image du plat"}]; 
         this.orderTableColumnsName = [{id: "Id"}, {order_date: "Date de la commande"}, {user_fk: "Id de l'utilisateur"}]
         this.categoryTableColumnsName = [{id: "Id"}, {name: "Nom"}]
 
-        this.check = undefined
+        this.check = undefined;
+        this.tableBodyMapper = undefined;
     }
 
     closeModal(){
@@ -75,18 +79,22 @@ class Table extends React.Component{
             case "meal":
                 table = this.createTable(this.mealTableColumnsName);
                 this.check = (row, research) => {return row.id === parseInt(research) || row.name?.toLowerCase().includes(research.toLowerCase()) || row.description?.toLowerCase().includes(research.toLowerCase())};
+                this.tableBodyMapper = mealTableBodyMapper;
                 break;
             case "user":
                 table = this.createTable(this.userTableColumnsName);
                 this.check = (row, research) => {return row.id === parseInt(research) || row.firstname?.toLowerCase().includes(research.toLowerCase()) || row.lastname?.toLowerCase().includes(research.toLowerCase()) || row.username?.toLowerCase().includes(research.toLowerCase())};
+                this.tableBodyMapper = userTableBodyMapper;
                 break;
             case "order":
                 table = this.createTable(this.orderTableColumnsName);
                 this.check = (row, research) => {return row.id === parseInt(research) || row.order_date?.toLowerCase().includes(research.toLowerCase())};
+                this.tableBodyMapper = orderTableBodyMapper;
                 break;
             case "category":
                 table = this.createTable(this.categoryTableColumnsName);
                 this.check = (row, research) => {return row.id === parseInt(research) || row.name?.toLowerCase().includes(research.toLowerCase())};
+                this.tableBodyMapper = categoryTableBodyMapper;
                 break;
             default:
                 table = undefined;
@@ -141,7 +149,7 @@ class Table extends React.Component{
                         </tr>
                     </thead>
                     <tbody>
-                        {tableRowsForUse.map((rowObject, index) => { //TODO: si on fait une api qui renvoie des objets -> faire un mapper qui genère le tableau en fonction des différentes tables
+                        {tableRowsForUse.map((rowObject, index) => {
                             return (
                                 <tr className={classes.tableRow} key={index}>
                                     <td>
@@ -150,7 +158,7 @@ class Table extends React.Component{
                                         }}></button>
                                         <button className="btn far fa-trash-alt" onClick={() => this.deleteRow(rowObject.id)}></button>
                                     </td>
-                                    {mealTableBodyMapper(rowObject)}
+                                    {this.tableBodyMapper(rowObject)}
                                 </tr>
                             );
                         })}
@@ -158,19 +166,6 @@ class Table extends React.Component{
                 </table>);
         }
     }
-
-   /*  tableCellFormatted(rowObject, columnObject, index){//formate la celulle du tableau si c'est une date ou un bool
-        const property = Object.keys(columnObject)[0];
-        if(typeof(rowObject[property]) === "boolean" && rowObject[property] === true){
-            return <td key={index}>Oui</td>
-        }else if(typeof(rowObject[property]) === "boolean" && rowObject[property] === false){
-            return <td key={index}>Non</td>
-        }else if(index === 8 && rowObject?.image !== undefined && rowObject?.image !== null && rowObject.image.endsWith('.jpeg')){ // 8 car l'image se trouve à la 9e colonne //TODO: faire dynamiquement ? 
-            const imgTag = <img src={`http://localhost:3001/mealimages/${rowObject.image}`} alt="meal" width="200" height="185"/>;
-            return <td key={index}>{imgTag}</td>
-        }
-        return <td key={index}>{rowObject[property]}</td>
-    } */
 
     async saveModificationsModal(modifiedObject){
         if(this.rowObjectToModify !== undefined && !this.isOldAndNewRowEqual(this.rowObjectToModify,modifiedObject)){
@@ -207,7 +202,7 @@ class Table extends React.Component{
         }
     }
 
-    isOldAndNewRowEqual(object1, object2) {//check si l'objet à tous les niveaux de profondeur si il est le même
+    isOldAndNewRowEqual(object1, object2) {//check l'objet à tous les niveaux de profondeur si il est le même
         const keys1 = Object.keys(object1);
         const keys2 = Object.keys(object2);
         if (keys1.length !== keys2.length) {
@@ -227,7 +222,7 @@ class Table extends React.Component{
         return object != null && typeof object === 'object';
       }
     
-    async deleteRow(id){ //TODO: supprimer la ligne
+    async deleteRow(id){
         const idForAPI = {
             id: id
         }

@@ -8,6 +8,7 @@ export function getOrderForm(modalInstance){
         date = fromDDMMYYYYToYYYYMMDD(modalInstance.oldRowObject.order_date);
     }else{
         date = fromDDMMYYYYToYYYYMMDD();
+        modalInstance.tempRow.order_date = date;
     }
     return (
         <>

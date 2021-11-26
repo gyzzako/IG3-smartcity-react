@@ -1,26 +1,36 @@
 import classes from '../BackOffice.module.css';
 import {fromYYYYMMDDToDDMMYYYY, fromDDMMYYYYToYYYYMMDD} from '../../../utils/dateFormatConverter';
 import { getAPIHeaderWithJWTToken } from '../../../utils/utils';
-import axios from 'axios';
+import {getFullTableDataFromApi} from '../../../API/index';
 
 export async function getMealForm(modalInstance){
-    let date;
-    if (modalInstance.oldRowObject !== undefined) {
-        date = fromDDMMYYYYToYYYYMMDD(modalInstance.oldRowObject.publication_date);
-    }else{
-        date = fromDDMMYYYYToYYYYMMDD();
-        modalInstance.tempRow.publication_date = date;
-    }
-    modalInstance.tempRow.oldImageName = modalInstance.oldRowObject?.image;
-
     const config = getAPIHeaderWithJWTToken();
-    const {data: categories} = await axios.get("http://localhost:3001/v1/category", config);
+    const {data: categories} = await getFullTableDataFromApi("category", config);
 
     const categoryOptions = categories.map(category => {
         return (
             <option category_id={category.id} key={category.id}>{category.name}</option>
         );
     })
+
+    //de base pour le cas si il laisse la categorie de base
+    let category = {
+        id: categories[0].id,
+        name: categories[0].name
+    }
+    modalInstance.tempRow.category = category;
+
+    let date;
+    if (modalInstance.oldRowObject !== undefined) {
+        date = fromDDMMYYYYToYYYYMMDD(modalInstance.oldRowObject.publication_date);
+
+        modalInstance.tempRow.category.id = categories[0].id;
+    }else{
+        date = fromDDMMYYYYToYYYYMMDD();
+        modalInstance.tempRow.publication_date = date;
+    }
+
+    modalInstance.tempRow.oldImageName = modalInstance.oldRowObject?.image;
 
     return (
         <>
@@ -79,7 +89,7 @@ export async function getMealForm(modalInstance){
                                         const selectedIndex = e.target.options.selectedIndex;
                                         modalInstance.tempRow.category.id = e.target.options[selectedIndex].getAttribute('category_id');
                                         modalInstance.tempRow.category.name = e.target.value;}}
-                                        className="form-control" name="pets" id="pet-select">
+                                        className="form-control">
                         {categoryOptions}
                     </select>
                 </div>

@@ -1,4 +1,4 @@
-export function mealTableBodyMapper(rowObject){
+export function tableBodyMapper(rowObject){
     let imageLink;
     if(rowObject.image !== null){ //TODO: à enlever plus tard -> remplir la db de base avec des images pour les plats déjà présent
         imageLink = `http://localhost:3001/mealimages/${rowObject.image}`;
@@ -13,7 +13,7 @@ export function mealTableBodyMapper(rowObject){
             <td>{rowObject.user_fk}</td>
             <td>{rowObject.category.name}</td>
             <td>{rowObject.order_fk}</td>
-            <td>{imageLink}</td>
+            <td><img width="150" height="150" src={imageLink} alt="meal"></img></td>
         </>
     );
 }

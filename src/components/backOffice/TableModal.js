@@ -36,14 +36,17 @@ class TableModal extends React.Component{
             case "user":
                 this.state.form.formContent = getUserForm(this);
                 this.state.form.isFormValid = isUserFormValid;
+                this.setState({});
                 break;
             case "order":
                 this.state.form.formContent = getOrderForm(this);
                 this.state.form.isFormValid = isOrderFormValid;
+                this.setState({});
                 break;
             case "category":
                 this.state.form.formContent = getCategoryForm(this);
                 this.state.form.isFormValid = isCategoryFormValid;
+                this.setState({});
                 break;
             default:
                 this.state.form.errorMessage = "Error: Table not found !";
@@ -86,7 +89,6 @@ class TableModal extends React.Component{
 
             </Modal.Body>
             <Modal.Footer>
-                <p>{this.state.modalErrorMessage}</p>
                 <Button variant="secondary" onClick={() => this.closeModal()}>
                     Fermer
                 </Button>
