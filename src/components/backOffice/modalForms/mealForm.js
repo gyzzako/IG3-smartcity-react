@@ -1,11 +1,11 @@
 import classes from '../BackOffice.module.css';
 import {fromYYYYMMDDToDDMMYYYY, fromDDMMYYYYToYYYYMMDD} from '../../../utils/dateFormatConverter';
 import { getAPIHeaderWithJWTToken } from '../../../utils/utils';
-import {getFullTableDataFromApi} from '../../../API/index';
+import {getTableDataFromApi} from '../../../API/index';
 
 export async function getMealForm(modalInstance){
     const config = getAPIHeaderWithJWTToken();
-    const {data: categories} = await getFullTableDataFromApi("category", config);
+    const {data: categories} = await getTableDataFromApi("category", config);
 
     const categoryOptions = categories.map(category => {
         return (
@@ -84,7 +84,7 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='categoryName'>Id de la catégorie</label>
+                    <label htmlFor='categoryName'>Nom de la catégorie</label>
                     <select defaultValue={modalInstance.oldRowObject?.category?.name} onChange={(e) => { 
                                         const selectedIndex = e.target.options.selectedIndex;
                                         modalInstance.tempRow.category.id = e.target.options[selectedIndex].getAttribute('category_id');

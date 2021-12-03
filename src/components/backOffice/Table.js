@@ -2,10 +2,9 @@ import React from "react";
 import classes from './BackOffice.module.css';
 import TableModal from "./TableModal";
 import objectFormatterForAPI from '../../utils/objectFormatterForAPI';
-import {getAPIHeaderWithJWTToken, getErrorMessageWithAPI} from '../../utils/utils';
-import {getFullTableDataFromApi, updateTableRowToAPI,
-        getTableRowByIdFromAPI, deleteTableRowToAPI,
-        postTableRowToAPI} from '../../API/index';
+import {getAPIHeaderWithJWTToken, getErrorMessageWithAPI, isOldAndNewRowEqual} from '../../utils/utils';
+import {getTableDataFromApi, updateTableRowToAPI, deleteTableRowToAPI,
+        postTableRowToAPI, getTableCountFromApi} from '../../API/index';
 import PropTypes from 'prop-types';
 import {userHasToRelog} from '../../utils/utils';
 import { Redirect } from "react-router-dom";
@@ -20,12 +19,15 @@ class Table extends React.Component{
         this.state={
             chosenTable: props.chosenTable,
             tableRows: undefined,
-            rowsToShow: undefined,
             showModal: false,
             showTable: false,
-            redirectToLogin: false
+            redirectToLogin: false,
+            rowPerTable: 5,
+            clickedTablePageNumber: 1,
+            pageNumberTotal: 1
         }
-        this.rowObjectToModify = undefined
+        this.totalRowsCount = undefined;
+        this.rowObjectToModify = undefined;
 
         //nom de colonnes perso pour chaque colonne dans les tables
         this.userTableColumnsName = [{id: "Id"}, {firstname: "Prénom"}, {lastname: "Nom"}, {phone_number: "Téléphone"}, {username: "Pseudo"}, {isadmin: "Administrateur"}, {province: "Province"}, {city:"Ville"}, {street_and_number:"Rue et numéro"}];
@@ -33,8 +35,10 @@ class Table extends React.Component{
         this.orderTableColumnsName = [{id: "Id"}, {order_date: "Date de la commande"}, {user_fk: "Id de l'utilisateur"}]
         this.categoryTableColumnsName = [{id: "Id"}, {name: "Nom"}]
 
-        this.check = undefined;
         this.tableBodyMapper = undefined;
+
+        this.researchedRow = undefined;
+        this.timeout = undefined;
     }
 
     closeModal(){
@@ -48,25 +52,37 @@ class Table extends React.Component{
     }
     
     async componentDidMount(){
-        await this.getTableRowsFromAPI();
-    }
-    
-    async getTableRowsFromAPI(){
         if(this.state.chosenTable !== undefined){
+            await this.loadTableData();
+        }
+    }
+
+    async componentDidUpdate(prevProps, prevState) {
+        if(this.state.chosenTable !== undefined && (this.state.rowPerTable !== prevState.rowPerTable || this.state.clickedTablePageNumber !== prevState.clickedTablePageNumber)){
+            await this.loadTableData(this.researchedRow);
+        }
+    }
+
+    async loadTableData(research){ //quand research n'est pas undefined c'est qu'on veut récupérer les lignes qui contiennent l'élément de recherche
+        try {
             const config = getAPIHeaderWithJWTToken();
-            try{
-                const {data} = await getFullTableDataFromApi(this.state.chosenTable, config);
-                const rowsData = data;
-                if(rowsData !== undefined){
-                    this.setState({tableRows: rowsData, rowsToShow: undefined, showTable: true});
-                }
-            }catch(e){
-                const errorMessage = getErrorMessageWithAPI(e.response);
-                alert(errorMessage);
-                console.error(e);
-                if(userHasToRelog()){
-                    this.setState({redirectToLogin: true});
-                }
+
+            const response = await getTableCountFromApi(this.state.chosenTable, config, research);
+            this.totalRowsCount = response.data.count;
+            this.setState({pageNumberTotal: Math.ceil(this.totalRowsCount/this.state.rowPerTable)})
+
+            //                                       table choisie     |    header | ligne par table        |           offset
+            const { data } = await getTableDataFromApi(this.state.chosenTable, config, this.state.rowPerTable, (this.state.clickedTablePageNumber - 1) * this.state.rowPerTable, research);
+            const rowsData = data;
+            if (rowsData !== undefined) {
+                this.setState({ tableRows: rowsData, showTable: true });
+            }
+        } catch (e) {
+            const errorMessage = getErrorMessageWithAPI(e.response);
+            alert(errorMessage);
+            console.error(e);
+            if (userHasToRelog()) {
+                this.setState({ redirectToLogin: true });
             }
         }
     }
@@ -78,32 +94,46 @@ class Table extends React.Component{
         switch(this.state.chosenTable){
             case "meal":
                 table = this.createTable(this.mealTableColumnsName);
-                this.check = (row, research) => {return row.id === parseInt(research) || row.name?.toLowerCase().includes(research.toLowerCase()) || row.description?.toLowerCase().includes(research.toLowerCase())};
                 this.tableBodyMapper = mealTableBodyMapper;
                 break;
             case "user":
                 table = this.createTable(this.userTableColumnsName);
-                this.check = (row, research) => {return row.id === parseInt(research) || row.firstname?.toLowerCase().includes(research.toLowerCase()) || row.lastname?.toLowerCase().includes(research.toLowerCase()) || row.username?.toLowerCase().includes(research.toLowerCase())};
                 this.tableBodyMapper = userTableBodyMapper;
                 break;
             case "order":
                 table = this.createTable(this.orderTableColumnsName);
-                this.check = (row, research) => {return row.id === parseInt(research) || row.order_date?.toLowerCase().includes(research.toLowerCase())};
+            
                 this.tableBodyMapper = orderTableBodyMapper;
                 break;
             case "category":
                 table = this.createTable(this.categoryTableColumnsName);
-                this.check = (row, research) => {return row.id === parseInt(research) || row.name?.toLowerCase().includes(research.toLowerCase())};
                 this.tableBodyMapper = categoryTableBodyMapper;
                 break;
             default:
                 table = undefined;
         }
 
+        let liElem = [];
+        for (let i = 1; i <= this.state.pageNumberTotal; i++) {
+            liElem.push(
+            <li key={i} style={{cursor: "pointer"}} className={i === this.state.clickedTablePageNumber ? "page-item active" : null} onClick={() => {this.setState({ clickedTablePageNumber: i })}}>
+               <span className="page-link">{i}</span>
+            </li>
+            ) 
+        }
+        
         return(
             <div className={classes.tableData}>
-                <input onChange={(e) => {this.searchInTable(e.target.value)}} style={{float: "left", height: 40}} placeholder="Rechercher" type="text"/>
-                <button onClick={() => this.showModal()} style={{backgroundColor : "#38015c", color: "white", float: "right"}} className="btn mb-3">AJOUTER</button>
+                <div>
+                    <input onChange={(e) => {this.searchInTable(e.target.value)}} style={{float: "left", height: 40}} placeholder="Rechercher" type="text"/>
+                    <label style={{marginRight: 5}} id="totalRowsSelectorLabel">LIMIT:</label>
+                    <select onChange={(e) => this.setState({rowPerTable: parseInt(e.target.value), clickedTablePageNumber: 1})} defaultValue={this.state.rowPerTable} name="totalRowsSelector" id="totalRowsSelector">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="50">50</option>
+                    </select>
+                    <button onClick={() => this.showModal()} style={{backgroundColor : "#38015c", color: "white", float: "right"}} className="btn mb-3">AJOUTER</button>
+                </div>
                 <div className={classes.table}>
                     {this.state.showTable && table}
                 </div>
@@ -111,31 +141,33 @@ class Table extends React.Component{
                     saveModificationsCallback={(newRowObject) => { this.saveModificationsModal(newRowObject) }} 
                     addNewRowCallback={(newRowObject) => { this.addNewRow(newRowObject) }} key={this.state.chosenTable} chosenTable={this.state.chosenTable}/>
                 }
+                <nav>
+                    <ul className="pagination pagination-sm">
+                        {this.state.showTable && liElem.map(elem => {return elem})}
+                    </ul>
+                </nav>
             </div>
         );
     }
 
-    searchInTable(research){
-        if(this.state.tableRows){
-            const rowsToShow = this.state.tableRows;
-            const afterFiltering = rowsToShow.filter(row => {
-                return this.check(row, research);
-            })
-            this.setState({rowsToShow: afterFiltering});
+    async searchInTable(research){
+        //créé un timer et supprime l'ancien à la saisie d'une touche. Si plus de touche après 750 ms, alors on exécute la requête
+        if (this.state.showTable && research !== "") {
+            if (this.timeout) clearTimeout(this.timeout);
+            this.timeout = setTimeout(async () => {
+                this.state.clickedTablePageNumber = 1; //pas setState car pas besoin de refresh le composent
+                this.researchedRow = research;
+                this.loadTableData(research);
+            }, 750);
+        }else if(research === ""){
+            if(this.timeout) clearTimeout(this.timeout);
+            this.researchedRow = undefined;
+            await this.loadTableData();
         }
     }
 
     createTable(columnsNameObject){
-        let tableRowsForUse;
-        if(this.state.rowsToShow === undefined && this.state.tableRows !== undefined){
-            //table quand pas de recherche
-            tableRowsForUse = this.state.tableRows
-        }else if(this.state.rowsToShow !== undefined){
-            //table quand on recherche
-            tableRowsForUse = this.state.rowsToShow
-        }
-
-        if(tableRowsForUse !== undefined){
+        if(this.state.tableRows !== undefined){
             return (
                 <table>
                     <thead>
@@ -149,7 +181,7 @@ class Table extends React.Component{
                         </tr>
                     </thead>
                     <tbody>
-                        {tableRowsForUse.map((rowObject, index) => {
+                        {this.state.tableRows.map((rowObject, index) => {
                             return (
                                 <tr className={classes.tableRow} key={index}>
                                     <td>
@@ -168,23 +200,14 @@ class Table extends React.Component{
     }
 
     async saveModificationsModal(modifiedObject){
-        if(this.rowObjectToModify !== undefined && !this.isOldAndNewRowEqual(this.rowObjectToModify,modifiedObject)){
-            
+        if(this.rowObjectToModify !== undefined && !isOldAndNewRowEqual(this.rowObjectToModify,modifiedObject)){
             try{
                 const rowForAPI = objectFormatterForAPI.formatObject(this.state.chosenTable, modifiedObject);
 
                 const config = getAPIHeaderWithJWTToken();
                 const patchResponse = await updateTableRowToAPI(this.state.chosenTable, rowForAPI, config);
                 if(patchResponse?.status === 204){
-                    const id = modifiedObject.id;
-                    const {data} = await getTableRowByIdFromAPI(this.state.chosenTable, id, config)
-                    const rowData = data[0];
-                    if (rowData !== undefined) {
-                        // pour de meilleures performances on récup seulement le user updated pour update le tableau contenant tous les users
-                        this.updateLocalTableAfterModifications(id, rowData);
-                    }else{//si on arrive pas à récup seulement le user updated, on récupère tous les users
-                        this.getTableRowsFromAPI()
-                    }
+                    this.loadTableData();
                 }else{
                     alert("Les modifications n'ont pas pu être enregistrées. Réessayez !");
                 }
@@ -201,26 +224,6 @@ class Table extends React.Component{
             this.closeModal();
         }
     }
-
-    isOldAndNewRowEqual(object1, object2) {//check l'objet à tous les niveaux de profondeur si il est le même
-        const keys1 = Object.keys(object1);
-        const keys2 = Object.keys(object2);
-        if (keys1.length !== keys2.length) {
-          return false;
-        }
-        for (const key of keys1) {
-          const val1 = object1[key];
-          const val2 = object2[key];
-          const areObjects = this.isObject(val1) && this.isObject(val2);
-          if ((areObjects && !this.deepEqual(val1, val2)) || (!areObjects && val1 !== val2)){
-            return false;
-          }
-        }
-        return true;
-    }
-    isObject(object) {
-        return object != null && typeof object === 'object';
-      }
     
     async deleteRow(id){
         const idForAPI = {
@@ -228,10 +231,9 @@ class Table extends React.Component{
         }
         try{
             const config = getAPIHeaderWithJWTToken();
-            const response = await deleteTableRowToAPI(this.state.chosenTable, idForAPI, config); //TODO: quand on met une fk qui n'exite pas pour order, category ou user -> pas de response mais direct dans le catch (pareil pour patch)
+            const response = await deleteTableRowToAPI(this.state.chosenTable, idForAPI, config);
             if(response?.status === 204){
-                //pour de meilleures performances on récup ne récupère pas tous les users, on modifie en local
-                this.updateLocalTableAfterModifications(id);
+                this.loadTableData();
             }else{
                 alert("La suppresion n'a pas pu être réalisée. Réessayez !")
             }
@@ -245,30 +247,6 @@ class Table extends React.Component{
         }
     }
 
-    updateLocalTableAfterModifications(idToFind, rowData){//si rowData !== undefined => c'est que cette méthode a été appellée depuis 'saveModificationsModal' sinon de 'deleteRow'
-        let iTableRow;
-
-        //update table in react
-        iTableRow = this.state.tableRows.findIndex(row => row.id === idToFind);
-        if(rowData !== undefined){
-            this.state.tableRows.splice(iTableRow, 1, rowData); //ré-insère la ligne modifiée dans le tableau au bon endroit
-        }else{
-            this.state.tableRows.splice(iTableRow, 1); //supprime la ligne supprimée dans le tableau
-        }
-        this.setState({tableRows: this.state.tableRows});
-
-        //update searchTable in react
-        if(this.state.rowsToShow !== undefined){
-            iTableRow = this.state.rowsToShow.findIndex(row => row.id === idToFind);
-            if(rowData !== undefined){
-                this.state.rowsToShow.splice(iTableRow, 1, rowData) //ré-insère la ligne modifiée dans le tableau au bon endroit
-            }else{
-                this.state.rowsToShow.splice(iTableRow, 1) //supprime la ligne supprimée dans le tableau
-            }
-            this.setState({rowsToShow: this.state.rowsToShow});
-        }
-    }
-
     async addNewRow(newRowObject){
         try{
             const rowForAPI = objectFormatterForAPI.formatObject(this.state.chosenTable, newRowObject);
@@ -277,7 +255,7 @@ class Table extends React.Component{
             const response = await postTableRowToAPI(this.state.chosenTable, rowForAPI, config);
             if(response?.status === 201){
                 //update table in react
-                this.getTableRowsFromAPI();
+                this.loadTableData();
             }else{
                 alert("L'ajout n'a pas pu être réalisé. Réessayez !");
             }
@@ -290,7 +268,6 @@ class Table extends React.Component{
                 this.setState({redirectToLogin: true});
             }
         }
-        
     }
 }
 

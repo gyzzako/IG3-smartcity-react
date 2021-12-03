@@ -11,16 +11,32 @@ axiosRetry(axios, {
 
 const BASE_URL = "http://localhost:3001/v1/";
 
-const getFullTableDataFromApi = async (tableName, config) => {
-   return await axios.get(`${BASE_URL}${tableName}`, config);
+const getTableDataFromApi = async (tableName, config, rowNumberLimit, offset, searchElem) => {
+    if(rowNumberLimit === undefined || offset === undefined){
+        //get table entière (pour les petites tables genre catégorie)
+        return await axios.get(`${BASE_URL}${tableName}`, config);
+    }else{
+        if(searchElem === undefined){
+            //get les lignes de offset à offset + rowNumberLimit
+            return await axios.get(`${BASE_URL}${tableName}/?rowLimit=${rowNumberLimit}&offset=${offset}`, config);
+        }else{
+            //get les lignes contenanent searchElem de offset à offset + rowNumberLimit
+            return await axios.get(`${BASE_URL}${tableName}/?rowLimit=${rowNumberLimit}&offset=${offset}&searchElem=${searchElem}`, config);
+        }        
+    }
+}
+
+const getTableCountFromApi = async (tableName, config, searchElem) => {
+    if(searchElem === undefined){
+        return await axios.get(`${BASE_URL}${tableName}/count`, config);
+    }else{
+        return await axios.get(`${BASE_URL}${tableName}/count/?searchElem=${searchElem}`, config);
+    }
+    
 }
 
 const updateTableRowToAPI = async (tableName, rowData, config) => {
     return await axios.patch(`${BASE_URL}${tableName}`, rowData, config);
-}
-
-const getTableRowByIdFromAPI = async (tableName, id, config) => {
-    return await axios.get(`${BASE_URL}${tableName}/${id}`, config);
 }
 
 const deleteTableRowToAPI = async (tableName, idObject, config) => {
@@ -39,10 +55,10 @@ const loginUserWithAPI = async (data) => {
     return await axios.post('http://localhost:3001/v1/user/login', data);
 }
 
-export {getFullTableDataFromApi,
+export {getTableDataFromApi,
+        getTableCountFromApi,
         updateTableRowToAPI,
-        getTableRowByIdFromAPI,
         deleteTableRowToAPI,
         postTableRowToAPI,
         isUserAuthorizedForBackOfficeToAPI,
-        loginUserWithAPI};
+        loginUserWithAPI,};

@@ -29,7 +29,7 @@ class BackOffice extends React.Component{
             }
         } catch (e) {
             const errorMessage = getErrorMessageWithAPI(e.response);
-            console.error(errorMessage)
+            alert(errorMessage)
             if(userHasToRelog()){
                 this.setState({redirectToLogin: true});
             }

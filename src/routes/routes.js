@@ -12,28 +12,26 @@ const Login = lazy(() => import ("../components/login/Login"));
 export default function Routes(){
     return(
         <Router>
-                <Switch>
-                <Route path="/connexion">
-                    <Header/>
+            <Header/>
+            <Switch>
+                <Route exact path="/connexion">
                     <Suspense fallback={<div>Chargement...</div>}>
-                        <Login/>
+                        <Login />
                     </Suspense>
                 </Route>
 
-                <Route path="/administration">
-                    <Header/>
+                <Route exact path="/administration">
                     <Suspense fallback={<div>Chargement...</div>}>
-                    <BackOffice/>
+                        <BackOffice />
                     </Suspense>
                 </Route>
 
-                <Route path="/">
-                    <Header/>
+                <Route exact path="/">
                     <Suspense fallback={<div>Chargement...</div>}>
-                        <Login/>
+                        <Login />
                     </Suspense>
                 </Route>
-                </Switch>
+            </Switch>
         </Router>
     );
 }
