@@ -205,7 +205,6 @@ class Table extends React.Component{
                 const rowForAPI = objectFormatterForAPI.formatObject(this.state.chosenTable, modifiedObject);
 
                 const config = getAPIHeaderWithJWTToken(this.state.chosenTable);
-                console.log(config.headers)
                 const patchResponse = await updateTableRowToAPI(this.state.chosenTable, rowForAPI, config);
                 if(patchResponse?.status === 204){
                     this.loadTableData();
