@@ -32,7 +32,6 @@ const getTableCountFromApi = async (tableName, config, searchElem) => {
     }else{
         return await axios.get(`${BASE_URL}${tableName}/count/?searchElem=${searchElem}`, config);
     }
-    
 }
 
 const updateTableRowToAPI = async (tableName, rowData, config) => {

@@ -2,13 +2,22 @@ const apiBasicErrorMessage = "Erreur lors de l'accès à l'API";
 const api4xxErrorMessage = "Impossible de réaliser cette action";
 const api5xxErrorMessage = "Impossible de réaliser cette action pour le moment. Réessayer plus tard";
 
-module.exports.getAPIHeaderWithJWTToken = () => {
+module.exports.getAPIHeaderWithJWTToken = (tableName) => {
     const jwtToken = localStorage.getItem("jwt");
     let config;
     if (jwtToken !== null) {
-        config = {
-            headers: {
-                Authorization: "Bearer " + jwtToken
+        if(tableName === "meal"){
+            config = {
+                headers: {
+                    Authorization: "Bearer " + jwtToken,
+                    'Content-Type' : 'multipart/form-data'
+                }
+            }
+        }else{
+            config = {
+                headers: {
+                    Authorization: "Bearer " + jwtToken
+                }
             }
         }
     }
