@@ -2,7 +2,7 @@ import React from "react";
 import ActionBar from "./ActionBar";
 import classes from './BackOffice.module.css';
 import Table from "./Table";
-import {getAPIHeaderWithJWTToken, getErrorMessageWithAPI, userHasToRelog} from '../../utils/utils';
+import {getAPIHeaderWithJWTToken, getErrorMessageWithAPI, isJwtValid} from '../../utils/utils';
 import { Redirect } from "react-router-dom";
 import {isUserAuthorizedForBackOfficeToAPI} from '../../API/index';
 
@@ -30,7 +30,7 @@ class BackOffice extends React.Component{
         } catch (e) {
             const errorMessage = getErrorMessageWithAPI(e.response);
             alert(errorMessage)
-            if(userHasToRelog()){
+            if(!isJwtValid()){
                 this.setState({redirectToLogin: true});
             }
         }

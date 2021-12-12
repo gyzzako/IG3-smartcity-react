@@ -2,26 +2,47 @@ const apiBasicErrorMessage = "Erreur lors de l'accès à l'API";
 const api4xxErrorMessage = "Impossible de réaliser cette action";
 const api5xxErrorMessage = "Impossible de réaliser cette action pour le moment. Réessayer plus tard";
 
+const _this = this; //pour pouvoir utiliser la méthode isJwtValid dans ce fichier
+
 module.exports.getAPIHeaderWithJWTToken = (tableName) => {
     const jwtToken = localStorage.getItem("jwt");
+    const isValid = _this.isJwtValid(jwtToken);
     let config;
-    if (jwtToken !== null) {
-        if(tableName === "meal"){
-            config = {
-                headers: {
-                    Authorization: "Bearer " + jwtToken,
-                    'Content-Type' : 'multipart/form-data'
+    if(isValid){
+        if (jwtToken !== null) {
+            if(tableName === "meal"){
+                config = {
+                    headers: {
+                        Authorization: "Bearer " + jwtToken,
+                        'Content-Type' : 'multipart/form-data'
+                    }
                 }
-            }
-        }else{
-            config = {
-                headers: {
-                    Authorization: "Bearer " + jwtToken
+            }else{
+                config = {
+                    headers: {
+                        Authorization: "Bearer " + jwtToken
+                    }
                 }
             }
         }
     }
     return config;
+}
+
+module.exports.isJwtValid = (jwtToken) =>{
+    if(jwtToken === null || jwtToken === undefined) jwtToken = localStorage.getItem("jwt");
+    if(jwtToken !== null && jwtToken !== undefined){
+        const base64Token =  jwtToken.split('.')[1];
+        const payload = JSON.parse(Buffer.from(base64Token, 'base64').toString('utf-8'));
+        if(Date.now() < payload.exp*1000) return true;
+        else{
+            localStorage.removeItem("jwt");
+            return false;
+        }
+    }else{
+        localStorage.removeItem("jwt");
+        return false;
+    }
 }
 
 module.exports.getErrorMessageWithAPI = (responseObject) => {
@@ -44,11 +65,6 @@ module.exports.getErrorMessageWithAPI = (responseObject) => {
     }
     return errorMessage;
 }
-
-module.exports.userHasToRelog = () => {
-    return localStorage.getItem("jwt") === null ? true : false;
-}
-
 
 module.exports.isLocalStorageAvailable = () => {
     try {

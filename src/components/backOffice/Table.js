@@ -6,7 +6,7 @@ import {getAPIHeaderWithJWTToken, getErrorMessageWithAPI, isOldAndNewRowEqual} f
 import {getTableDataFromApi, updateTableRowToAPI, deleteTableRowToAPI,
         postTableRowToAPI, getTableCountFromApi} from '../../API/index';
 import PropTypes from 'prop-types';
-import {userHasToRelog} from '../../utils/utils';
+import {isJwtValid} from '../../utils/utils';
 import { Redirect } from "react-router-dom";
 import {tableBodyMapper as mealTableBodyMapper} from './tableContent/meal';
 import {tableBodyMapper as userTableBodyMapper} from './tableContent/user';
@@ -81,7 +81,7 @@ class Table extends React.Component{
             const errorMessage = getErrorMessageWithAPI(e.response);
             alert(errorMessage);
             console.error(e);
-            if (userHasToRelog()) {
+            if (!isJwtValid()) {
                 this.setState({ redirectToLogin: true });
             }
         }
@@ -216,7 +216,7 @@ class Table extends React.Component{
                 const errorMessage = getErrorMessageWithAPI(e.response);
                 alert(errorMessage);
                 console.error(e);
-                if(userHasToRelog()){
+                if(!isJwtValid()){
                     this.setState({redirectToLogin: true});
                 }
             }
@@ -241,7 +241,7 @@ class Table extends React.Component{
             const errorMessage = getErrorMessageWithAPI(e.response);
             alert(errorMessage);
             console.error(e);
-            if(userHasToRelog()){
+            if(!isJwtValid()){
                 this.setState({redirectToLogin: true});
             }
         }
@@ -264,7 +264,7 @@ class Table extends React.Component{
             const errorMessage = getErrorMessageWithAPI(e.response);
             alert(errorMessage);
             console.error(e);
-            if(userHasToRelog()){
+            if(!isJwtValid()){
                 this.setState({redirectToLogin: true});
             }
         }

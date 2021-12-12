@@ -105,7 +105,7 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='image'>Image</label>
+                    <label htmlFor='image'>Image (max 5MB)</label>
                     <input className="form-control"
                         type={"file"}
                         accept={"image/*"}
