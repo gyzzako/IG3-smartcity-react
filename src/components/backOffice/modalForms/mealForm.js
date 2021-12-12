@@ -36,7 +36,7 @@ export async function getMealForm(modalInstance){
         <>
             <form className={classes.form}>
                 <div>
-                    <label htmlFor='nom'>Nom</label>
+                    <label htmlFor='nom'>Nom*</label>
                     <input className="form-control"
                         type='text'
                         id='nom'
@@ -46,7 +46,7 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='description'>Description</label>
+                    <label htmlFor='description'>Description*</label>
                     <input className="form-control"
                         type='text'
                         id='description'
@@ -56,7 +56,7 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='portion'>Nombre de portion</label>
+                    <label htmlFor='portion'>Nombre de portion*</label>
                     <input className="form-control"
                         type='number'
                         id='portion'
@@ -67,13 +67,13 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='publicationDate'>Date de publication</label>
+                    <label htmlFor='publicationDate'>Date de publication*</label>
                     <input className="form-control" type="date" id="publicationDate" name="publicationDate"
                         defaultValue={date} required onChange={(e) => { modalInstance.tempRow.publication_date = e.target.value }}>
                     </input>
                 </div>
                 <div>
-                    <label htmlFor='userId'>Id de l'utilisateur</label>
+                    <label htmlFor='userId'>Id de l'utilisateur*</label>
                     <input className="form-control"
                         type='number'
                         id='userId'
@@ -84,7 +84,7 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='categoryName'>Nom de la catégorie</label>
+                    <label htmlFor='categoryName'>Nom de la catégorie*</label>
                     <select defaultValue={modalInstance.oldRowObject?.category?.name} onChange={(e) => { 
                                         const selectedIndex = e.target.options.selectedIndex;
                                         modalInstance.tempRow.category.id = e.target.options[selectedIndex].getAttribute('category_id');
@@ -105,7 +105,7 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='image'>Image (max 5MB)</label>
+                    <label htmlFor='image'>Image (max 5MB)*</label>
                     <input className="form-control"
                         type={"file"}
                         accept={"image/*"}

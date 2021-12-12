@@ -14,13 +14,13 @@ export function getOrderForm(modalInstance){
         <>
             <form className={classes.form}>
                 <div>
-                    <label htmlFor='orderDate'>Date de commande</label>
+                    <label htmlFor='orderDate'>Date de commande*</label>
                     <input className="form-control" type="date" id="orderDate" name="orderDate"
                         defaultValue={date} required onChange={(e) => { modalInstance.tempRow.order_date = e.target.value }}>
                     </input>
                 </div>
                 <div>
-                    <label htmlFor='userId'>Id de l'utilisateur</label>
+                    <label htmlFor='userId'>Id de l'utilisateur*</label>
                     <input className="form-control"
                         type='number'
                         id='userId'
