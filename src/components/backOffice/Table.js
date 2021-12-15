@@ -68,7 +68,7 @@ class Table extends React.Component{
             const config = getAPIHeaderWithJWTToken();
 
             const response = await getTableCountFromApi(this.state.chosenTable, config, research);
-            this.totalRowsCount = response.data.count;
+            this.totalRowsCount = response.data;
             this.setState({pageNumberTotal: Math.ceil(this.totalRowsCount/this.state.rowPerTable)})
 
             //                                       table choisie     |    header | ligne par table        |           offset
