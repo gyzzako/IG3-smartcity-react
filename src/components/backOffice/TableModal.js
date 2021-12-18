@@ -89,7 +89,6 @@ class TableModal extends React.Component{
 
             </Modal.Body>
             <Modal.Footer>
-                <p>* Champs requis</p> 
                 <Button variant="secondary" onClick={() => this.closeModal()}>
                     Fermer
                 </Button>

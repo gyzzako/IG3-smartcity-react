@@ -6,7 +6,7 @@ export function getUserForm(modalInstance){
         <>
             <form className={classes.form}>
                 <div>
-                    <label htmlFor='firstname'>Prénom*</label>
+                    <label htmlFor='firstname'>Prénom</label>
                     <input className="form-control"
                         type='text'
                         id='firstname'
@@ -16,7 +16,7 @@ export function getUserForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='lastname'>Nom*</label>
+                    <label htmlFor='lastname'>Non</label>
                     <input className="form-control"
                         type='text'
                         id='lastname'
@@ -26,7 +26,7 @@ export function getUserForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='phoneNumber'>Téléphone*</label>
+                    <label htmlFor='phoneNumber'>Téléphone</label>
                     <input className="form-control"
                         type='number'
                         id='phoneNumber'
@@ -36,7 +36,7 @@ export function getUserForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='username'>Pseudo*</label>
+                    <label htmlFor='username'>Pseudo</label>
                     <input className="form-control"
                         type='text'
                         id='username'
@@ -46,7 +46,7 @@ export function getUserForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='password'>Mot de passe*</label>
+                    <label htmlFor='password'>Mot de passe</label>
                     <input className="form-control"
                         type='password'
                         id='password'
@@ -56,7 +56,7 @@ export function getUserForm(modalInstance){
                         required />
                 </div>
                 <div className="row">
-                    <label htmlFor='isAdmin'>Administrateur*</label>
+                    <label htmlFor='isAdmin'>Administrateur</label>
                     <div className="col">
                         Oui<input type='radio'
                             name='isAdmin'
@@ -78,7 +78,7 @@ export function getUserForm(modalInstance){
                     </div>
                 </div>
                 <div>
-                    <label htmlFor='province'>Province*</label>
+                    <label htmlFor='province'>Province</label>
                     <input className="form-control"
                         type='text'
                         id='province'
@@ -88,7 +88,7 @@ export function getUserForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='city'>Ville*</label>
+                    <label htmlFor='city'>Ville</label>
                     <input className="form-control"
                         type='text'
                         id='city'
@@ -98,7 +98,7 @@ export function getUserForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='streetAndNumber'>Rue et numéro*</label>
+                    <label htmlFor='streetAndNumber'>Rue et numéro</label>
                     <input className="form-control"
                         type='text'
                         id='streetAndNumber'
@@ -117,7 +117,6 @@ export function isUserFormValid(rowObject){
     if(rowObject.lastname === undefined || rowObject.lastname === "") throw new Error("Entrez un nom valide");
     if(rowObject.phone_number === undefined || rowObject.phone_number === "") throw new Error("Entrez un numéro de téléphone valide");
     if(rowObject.username === undefined || rowObject.username === "") throw new Error("Entrez un pseudo valide");
-    if(rowObject.password === undefined || rowObject.password === "") throw new Error("Entrez un mot de passe valide");
     if(rowObject.isadmin === undefined) throw new Error("Entrez un type d'utilisateur valide");
     if(rowObject.province === undefined || rowObject.province === "") throw new Error("Entrez une province valide");
     if(rowObject.city === undefined || rowObject.city === "") throw new Error("Entrez une ville valide");

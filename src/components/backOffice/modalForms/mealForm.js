@@ -36,7 +36,7 @@ export async function getMealForm(modalInstance){
         <>
             <form className={classes.form}>
                 <div>
-                    <label htmlFor='nom'>Nom*</label>
+                    <label htmlFor='nom'>Nom</label>
                     <input className="form-control"
                         type='text'
                         id='nom'
@@ -46,7 +46,7 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='description'>Description*</label>
+                    <label htmlFor='description'>Description</label>
                     <input className="form-control"
                         type='text'
                         id='description'
@@ -56,7 +56,7 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='portion'>Nombre de portion*</label>
+                    <label htmlFor='portion'>Nombre de portion</label>
                     <input className="form-control"
                         type='number'
                         id='portion'
@@ -67,13 +67,13 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='publicationDate'>Date de publication*</label>
+                    <label htmlFor='publicationDate'>Date de publication</label>
                     <input className="form-control" type="date" id="publicationDate" name="publicationDate"
                         defaultValue={date} required onChange={(e) => { modalInstance.tempRow.publication_date = e.target.value }}>
                     </input>
                 </div>
                 <div>
-                    <label htmlFor='userId'>Id de l'utilisateur*</label>
+                    <label htmlFor='userId'>Id de l'utilisateur</label>
                     <input className="form-control"
                         type='number'
                         id='userId'
@@ -84,7 +84,7 @@ export async function getMealForm(modalInstance){
                         required />
                 </div>
                 <div>
-                    <label htmlFor='categoryName'>Nom de la catégorie*</label>
+                    <label htmlFor='categoryName'>Nom de la catégorie</label>
                     <select defaultValue={modalInstance.oldRowObject?.category?.name} onChange={(e) => { 
                                         const selectedIndex = e.target.options.selectedIndex;
                                         modalInstance.tempRow.category.id = e.target.options[selectedIndex].getAttribute('category_id');
@@ -94,18 +94,18 @@ export async function getMealForm(modalInstance){
                     </select>
                 </div>
                 <div>
-                    <label htmlFor='orderId'>Id de la commande</label>
+                    <label htmlFor='orderId'>{modalInstance.oldRowObject !== undefined ? "Id de la commande (-1 pour aucune)" : "Id de la commande"}</label>
                     <input className="form-control"
                         type='number'
                         id='orderId'
                         name="orderId"
-                        min="0"
+                        min="-1"
                         defaultValue={modalInstance.oldRowObject?.order_fk}
                         onChange={(e) => {modalInstance.tempRow.order_fk = isNaN(parseInt(e.target.value)) ? undefined : parseInt(e.target.value) }}
                         required />
                 </div>
                 <div>
-                    <label htmlFor='image'>Image (max 5MB)*</label>
+                    <label htmlFor='image'>Image (max 5MB)</label>
                     <input className="form-control"
                         type={"file"}
                         accept={"image/*"}
@@ -127,6 +127,7 @@ export function isMealFormValid(rowObject){
     if(rowObject.portion_number < 1) throw new Error("Entrez un nombre de portion supérieur à 0");
     if(rowObject.publication_date === undefined || rowObject.publication_date === "") throw new Error("Entrez une date valide");
     if(rowObject.user_fk === undefined || isNaN(rowObject.user_fk)) throw new Error("Entrez un utilisateur valide");
+    if(rowObject.order_fk === undefined || isNaN(rowObject.order_fk)) throw new Error("Entrez un id de commande valide");
     if(rowObject.category.id === undefined || isNaN(rowObject.category.id)) throw new Error("Entrez une categorie valide");
     if(rowObject.image === undefined || rowObject.image === "") throw new Error("Entrez un lien d'image valide");
 

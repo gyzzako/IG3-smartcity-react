@@ -5,7 +5,7 @@ export function getCategoryForm(modalInstance){
         <>
             <form className={classes.form}>
                 <div>
-                    <label htmlFor='nom'>Nom*</label>
+                    <label htmlFor='nom'>Nom</label>
                     <input className="form-control"
                         type='text'
                         id='nom'
