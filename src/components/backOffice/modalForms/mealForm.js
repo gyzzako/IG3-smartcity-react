@@ -12,7 +12,7 @@ export async function getMealForm(modalInstance){
             <option category_id={category.id} key={category.id}>{category.name}</option>
         );
     })
-
+    
     //de base pour le cas si il laisse la categorie de base
     let category = {
         id: categories[0].id,
@@ -24,7 +24,7 @@ export async function getMealForm(modalInstance){
     if (modalInstance.oldRowObject !== undefined) {
         date = fromDDMMYYYYToYYYYMMDD(modalInstance.oldRowObject.publication_date);
 
-        modalInstance.tempRow.category.id = categories[0].id;
+        modalInstance.tempRow.category = modalInstance.oldRowObject.category;
     }else{
         date = fromDDMMYYYYToYYYYMMDD();
         modalInstance.tempRow.publication_date = date;
@@ -127,7 +127,6 @@ export function isMealFormValid(rowObject){
     if(rowObject.portion_number < 1) throw new Error("Entrez un nombre de portion supérieur à 0");
     if(rowObject.publication_date === undefined || rowObject.publication_date === "") throw new Error("Entrez une date valide");
     if(rowObject.user_fk === undefined || isNaN(rowObject.user_fk)) throw new Error("Entrez un utilisateur valide");
-    if(rowObject.order_fk === undefined || isNaN(rowObject.order_fk)) throw new Error("Entrez un id de commande valide");
     if(rowObject.category.id === undefined || isNaN(rowObject.category.id)) throw new Error("Entrez une categorie valide");
     if(rowObject.image === undefined || rowObject.image === "") throw new Error("Entrez un lien d'image valide");
 
