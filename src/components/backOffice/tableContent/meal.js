@@ -9,7 +9,7 @@ export function tableBodyMapper(rowObject){
             <td>{rowObject.user_fk}</td>
             <td>{rowObject.category.name}</td>
             <td>{rowObject.order_fk}</td>
-            <td><img loading="lazy" width="150" height="150" src={rowObject.image} alt="meal"></img></td>
+            <td><img loading="lazy" width="150" height="150" src={`http://localhost:3001/mealimages/${rowObject.image}`} alt="meal"></img></td>
         </>
     );
 }
