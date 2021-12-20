@@ -47,11 +47,11 @@ const postTableRowToAPI = async (tableName, rowData, config) => {
 }
 
 const isUserAuthorizedForBackOfficeToAPI = async (config) => {
-    return await axios.get("http://localhost:3001/v1/user/backoffice-authorization", config);
+    return await axios.get(`${BASE_URL}user/backoffice-authorization`, config);
 }
 
 const loginUserWithAPI = async (data) => {
-    return await axios.post('http://localhost:3001/v1/user/login', data);
+    return await axios.post(`${BASE_URL}user/login`, data);
 }
 
 export {getTableDataFromApi,
