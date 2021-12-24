@@ -6,6 +6,7 @@ export function getOrderForm(modalInstance){
     let date;
     if (modalInstance.oldRowObject !== undefined) {
         date = fromDDMMYYYYToYYYYMMDD(modalInstance.oldRowObject.order_date);
+        modalInstance.tempRow.user_fk = modalInstance.oldRowObject?.user?.id;
     }else{
         date = fromDDMMYYYYToYYYYMMDD();
         modalInstance.tempRow.order_date = date;
@@ -26,7 +27,7 @@ export function getOrderForm(modalInstance){
                         id='userId'
                         name="userId"
                         min="0"
-                        defaultValue={modalInstance.oldRowObject?.user_fk}
+                        defaultValue={modalInstance.oldRowObject?.user?.id}
                         onChange={(e) => { modalInstance.tempRow.user_fk = parseInt(e.target.value) }}
                         required />
                 </div>

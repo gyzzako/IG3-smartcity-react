@@ -12,9 +12,8 @@ export async function getMealForm(modalInstance){
             <option category_id={category.id} key={category.id}>{category.name}</option>
         );
     })
-    
-    //de base pour le cas si il laisse la categorie de base
-    let category = {
+
+    let category = {//de base pour le cas si il laisse la categorie de base
         id: categories[0].id,
         name: categories[0].name
     }
@@ -25,12 +24,11 @@ export async function getMealForm(modalInstance){
         date = fromDDMMYYYYToYYYYMMDD(modalInstance.oldRowObject.publication_date);
 
         modalInstance.tempRow.category = modalInstance.oldRowObject.category;
+        modalInstance.tempRow.user_fk = modalInstance.oldRowObject?.user?.id;
     }else{
         date = fromDDMMYYYYToYYYYMMDD();
         modalInstance.tempRow.publication_date = date;
     }
-
-    modalInstance.tempRow.oldImageName = modalInstance.oldRowObject?.image;
 
     return (
         <>
@@ -79,7 +77,7 @@ export async function getMealForm(modalInstance){
                         id='userId'
                         name="userId"
                         min="0"
-                        defaultValue={modalInstance.oldRowObject?.user_fk}
+                        defaultValue={modalInstance.oldRowObject?.user?.id}
                         onChange={(e) => { modalInstance.tempRow.user_fk = parseInt(e.target.value) }}
                         required />
                 </div>
