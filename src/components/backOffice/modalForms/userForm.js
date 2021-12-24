@@ -1,6 +1,6 @@
 import classes from '../BackOffice.module.css';
 
-export function getUserForm(modalInstance){
+export function getUserForm(modalInstance){ //TODO: afficher l'utilisateur avec son pseudo et non id
     modalInstance.tempRow.isadmin = modalInstance.oldRowObject?.isadmin ? true : false;
     return (
         <>

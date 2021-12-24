@@ -32,7 +32,7 @@ class Table extends React.Component{
         //nom de colonnes perso pour chaque colonne dans les tables
         this.userTableColumnsName = [{id: "Id"}, {firstname: "Prénom"}, {lastname: "Nom"}, {phone_number: "Téléphone"}, {username: "Pseudo"}, {isadmin: "Administrateur"}, {province: "Province"}, {city:"Ville"}, {street_and_number:"Rue et numéro"}];
         this.mealTableColumnsName = [{id: "Id"}, {name: "Nom"}, {description: "Description"}, {portion_number: "Nombre de portion"}, {publication_date: "Date de publication"}, {user_fk: "Id de l'utilisateur"}, {category_fk: "Categorie"}, {order_fk: "Id de la commande"}, {image:"Image du plat"}]; 
-        this.orderTableColumnsName = [{id: "Id"}, {order_date: "Date de la commande"}, {user_fk: "Id de l'utilisateur"}]
+        this.orderTableColumnsName = [{id: "Id"}, {order_date: "Date de la commande"}, {user_fk: "Pseudo de l'utilisateur"}]
         this.categoryTableColumnsName = [{id: "Id"}, {name: "Nom"}]
 
         this.tableBodyMapper = undefined;

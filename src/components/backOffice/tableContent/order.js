@@ -3,7 +3,7 @@ export function tableBodyMapper(rowObject){
         <>
             <td>{rowObject.id}</td>
             <td>{rowObject.order_date}</td>
-            <td>{rowObject.user_fk}</td>
+            <td>{rowObject.user.username}</td>
         </>
     );
 }
